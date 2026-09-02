@@ -6,7 +6,8 @@ scorers ran on.
 
 | Path | What |
 |---|---|
-| `METHOD.md` | Both studies' complete rules, with the pre-registration hash chain |
+| `METHOD.md` | Studies 1 and 2's complete rules, with the pre-registration hash chain |
+| `PREREGISTRATION-study3-declaration-pass.md` | **Study 3, registered and unrun**: hypothesis, frozen ground-truth cluster set, three-conjunct decision rule, limitations — committed here before any arm was dispatched |
 | `briefs/` | The three ticket briefs, verbatim — audit them for approach leakage |
 | `declarations/stage0/` | All nine same-configuration arm declarations |
 | `declarations/model-axis/` | All six probe arm declarations (Opus, Sonnet) |
