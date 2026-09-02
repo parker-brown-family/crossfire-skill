@@ -1,0 +1,90 @@
+{
+ "run_id": "t2-adoption-a",
+ "ticket": "t2-adoption",
+ "base_sha": "93db4924d55c7971d5a2294e6c545b751ad0d42d",
+ "config": {
+  "model": "fable-5",
+  "effort": "session-default",
+  "framing": "none",
+  "axis": "same-config"
+ },
+ "decided": [
+  {
+   "id": "d1",
+   "surface": "app/src/instance.rs",
+   "claim": "Demote by a handicapped save time, not an absolute tier: a session known to hold <=1 pane competes in rank() as though saved TRIVIAL_HANDICAP earlier (effective_saved), so substance beats a throwaway near-term while recency always wins eventually \u2014 the abandoned giant cannot squat forever."
+  },
+  {
+   "id": "d2",
+   "surface": "app/src/main.rs",
+   "claim": "Record substance as a top-level `panes = N` scalar in the state file, written by build_state beside last_workspace, so the adoption scan reads it with the existing hand-rolled top-level line scanner \u2014 no TOML deserialization added to the boot path, and one read_to_string per candidate now serves both hints."
+  },
+  {
+   "id": "d3",
+   "surface": "app/src/instance.rs",
+   "claim": "A missing pane count (pre-upgrade files) is never docked: Candidate.panes = None reads as substantial, which is what keeps existing sessions ahead of fresh throwaways on the first launch after upgrading."
+  },
+  {
+   "id": "d4",
+   "surface": "app/src/instance.rs",
+   "claim": "Trivial means exactly panes <= 1 (a two-pane session already counts as arranged), and TRIVIAL_HANDICAP is 72h \u2014 sized to cover arrange-on-Friday / quick-window-Monday-morning while bounding how long a stale big session can outrank live trivial work."
+  },
+  {
+   "id": "d5",
+   "surface": "app/src/instance.rs",
+   "claim": "The workspace hint stays the untouched first sort key; the handicap only reshapes the recency comparison beneath it, so a session you were just standing on wins however small it is."
+  },
+  {
+   "id": "d6",
+   "surface": "app/src/instance.rs",
+   "claim": "Refactored toml_top_level_string into a shared raw-value helper (toml_top_level_value) plus string/usize wrappers, rather than duplicating the stop-at-first-table line scanner for the new numeric key."
+  },
+  {
+   "id": "d7",
+   "surface": "app/src/main.rs",
+   "claim": "Pinned the writer/scanner contract with a test (adoption_hints_serialize_into_the_top_level_table): toml 0.8 must emit both hints above the first `[` table header, since the scanner stops there and struct field order alone does not guarantee it."
+  },
+  {
+   "id": "d8",
+   "surface": "app/src/instance.rs",
+   "claim": "Left rank() shared between adoption and scratch-window theme borrowing (resolve_key/theme_key_in), so tear-offs inherit the same substance-aware order rather than forking a second ranking."
+  }
+ ],
+ "least_confident": [
+  {
+   "ref": "d4",
+   "why": "Both numbers are judgment calls: a two-pane throwaway still wins by pure recency, and the Friday-evening-to-Monday-morning gap (~63h) only just fits inside 72h; a different team might pick a tier per pane count or a different window."
+  },
+  {
+   "ref": "d1",
+   "why": "Any wrong winner refreshes its own mtime when adopted and closed, re-arming itself; that dynamic is pre-existing under pure recency, but the handicap extends the window in which a recently-closed big session can keep outranking new trivial work by up to 72h."
+  },
+  {
+   "ref": "d8",
+   "why": "A scratch window torn off near a one-pane session may now borrow the look of an older bigger session within the handicap instead of its literal parent; cosmetic only, but I could not observe it against a running compositor."
+  }
+ ],
+ "not_done": [
+  {
+   "claim": "Nothing was compiled or executed: cargo build/test, all new and edited tests, and the toml 0.8 serializer behaviors the change leans on (scalar hoisting above tables, None-field omission) are unverified \u2014 asserted by the new test but never run.",
+   "why": "Builds and test runs are out of scope for this exercise by instruction."
+  },
+  {
+   "claim": "No richer substance metric (tab count, agent panes, cwd variety) and no graded decay \u2014 pane count with a binary threshold only.",
+   "why": "Proportionate to the ask; the scan must stay cheap and the story only requires demoting the one-pane throwaway."
+  },
+  {
+   "claim": "Adoption-time save behavior unchanged: a session adopted and immediately closed still refreshes its mtime and re-wins the next launch.",
+   "why": "Pre-existing dynamic of mtime-based ranking, orthogonal to the ticket; changing save triggers has blast radius across the shrink guard and backups."
+  },
+  {
+   "claim": "share_demo's cloned state now also carries `panes`; behavior of demo windows under it is unverified.",
+   "why": "Demo state is loaded from TD_DEMO_STATE outside the sessions directory and is never adopted, so it should be inert \u2014 but only a running app would confirm."
+  }
+ ],
+ "cost": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "wall_clock_s": 0
+ }
+}

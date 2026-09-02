@@ -1,0 +1,332 @@
+{
+ "_what": "Model-axis probe adjudication per the rule pre-registered at the pre-registered probe rule (see METHOD.md). For each stage-0 cluster, each probe arm's stance vs the fable-modal design: aligned | fork | unaddressed (fork = different interface/signal/shape, or >=2x on a constant). Probe claims quoted per verdict. new_cluster entries are design questions no fable arm raised. Adjudicator caveats are carried inline in 'note' fields rather than smoothed away; two calls materially affect the criterial count and are flagged: one borderline fork (t2/c5) and one correlated fork pair (t3/c1+c2 sharing a single root design choice).",
+ "adjudicated": "2026-09-02",
+ "rubric": "the rubric in evidence/METHOD.md",
+ "tickets": {
+  "t1-reveal": [
+   {
+    "id": "c1",
+    "question": "How is reveal performed?",
+    "topic": "mechanism",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "aligned"
+    },
+    "justification": "opus d1: ShowItems, 'the one contract... all export'; gdbus->dbus-send->xdg-open containing dir. sonnet d1: ShowItems via dbus-send, fallback parent dir via open_with_system. Same interface, same chain shape as fable; leg count/order incidental as in stage 0."
+   },
+   {
+    "id": "c2",
+    "question": "Where does the reveal errand execute?",
+    "topic": "mechanism",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "aligned"
+    },
+    "justification": "opus d2: detached std::thread 'because deciding whether to try the next leg means waiting'. sonnet d2: std::thread::spawn over cx.background_executor(), matching the file's idiom."
+   },
+   {
+    "id": "c3",
+    "question": "Which file:// authorities count as local?",
+    "topic": "mechanism",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "aligned"
+    },
+    "justification": "opus d4: non-empty non-localhost refused as remote share. sonnet d4: empty or localhost only."
+   },
+   {
+    "id": "c4",
+    "question": "Malformed %-escapes?",
+    "topic": "mechanism",
+    "probe": {
+     "opus": "unaddressed",
+     "sonnet": "unaddressed"
+    },
+    "justification": "Neither probe declaration states a malformed-escape policy."
+   },
+   {
+    "id": "c5",
+    "question": "Non-UTF-8 bytes in a decoded path?",
+    "topic": "mechanism",
+    "probe": {
+     "opus": "unaddressed",
+     "sonnet": "unaddressed"
+    },
+    "justification": "Stage-0 fork cluster; neither probe arm declares a stance."
+   },
+   {
+    "id": "c6",
+    "question": "query/fragment on a printed file:// URI?",
+    "topic": "mechanism",
+    "probe": {
+     "opus": "unaddressed",
+     "sonnet": "unaddressed"
+    },
+    "justification": "Stage-0 fork cluster; neither probe arm declares a stance."
+   },
+   {
+    "id": "c7",
+    "question": "Outgoing URI percent-encoding alphabet?",
+    "topic": "mechanism",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "aligned"
+    },
+    "justification": "opus d3: encode before argv so no space/quote/backslash reaches the GVariant literal. sonnet d5+d8: hand-rolled, comma escaped for dbus-send array grammar, argv-never-shell. Same design; d8's argv rationale is complementary emphasis."
+   },
+   {
+    "id": "c8",
+    "question": "How is the reveal target classified and gated?",
+    "topic": "mechanism",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "aligned"
+    },
+    "justification": "opus d4: pure link_local_path over link_under output, one None gating both call sites. sonnet d6+d7: classify_link_under shared pipeline, reveal_under existence-gated, menu conditional."
+   },
+   {
+    "id": "c9",
+    "question": "Chord placement and fall-through?",
+    "topic": "mechanism",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "aligned"
+    },
+    "justification": "opus d5 and sonnet d3: Super+Ctrl before the open chord because Ctrl is contained; non-revealable falls through to open."
+   },
+   {
+    "id": "c10",
+    "question": "Localise the context-menu row?",
+    "topic": "presentation",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "aligned"
+    },
+    "justification": "opus d6: hardcoded English like Copy/Paste siblings. sonnet d7: hardcoded row, no localisation plumbing (pane.rs is its only touched file)."
+   },
+   {
+    "id": "c11",
+    "question": "Help-modal discoverability?",
+    "topic": "presentation",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "unaddressed"
+    },
+    "justification": "opus d7: LINKS row, two keys, nine languages \u2014 the fable-unanimous move. sonnet: no discoverability claim and no lang.rs change; an omission, not a declared counter-decision."
+   },
+   {
+    "id": "c12",
+    "question": "Changelog entry?",
+    "topic": "presentation",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "unaddressed"
+    },
+    "justification": "opus d8: Unreleased/Added entry plus info.html kiosk bullet. sonnet: none declared."
+   }
+  ],
+  "t2-adoption": [
+   {
+    "id": "c1",
+    "question": "What rule demotes a trivial session?",
+    "topic": "policy",
+    "probe": {
+     "opus": "fork",
+     "sonnet": "fork"
+    },
+    "agree_against_fable": false,
+    "justification": "Fable-modal = handicapped save time (2 of 3). opus d2: four keys with a coarse recency bucket then an arranged-vs-throwaway TIER \u2014 the tier shape (fable-b's minority design), fork vs modal. sonnet d3: bounded recency HANDICAP of 30 minutes \u2014 modal shape but a constant 144x below the fable handicaps, fork on the constant. The two probe arms also disagree with each other, so no blind-spot signature."
+   },
+   {
+    "id": "c2",
+    "question": "The demotion constant",
+    "topic": "threshold",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "fork"
+    },
+    "justification": "Fable constants {72h, 7d, 7d}; modal 7d. opus d4: RECENT_WORK 7 days \u2014 aligned. sonnet d3: TRIVIAL_HANDICAP 30 minutes \u2014 two orders of magnitude below every fable constant; fork."
+   },
+   {
+    "id": "c3",
+    "question": "What counts as trivial?",
+    "topic": "threshold",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "aligned"
+    },
+    "justification": "opus d3 and sonnet d2: panes <= 1, exactly the fable-unanimous boundary."
+   },
+   {
+    "id": "c4",
+    "question": "How is substance recorded?",
+    "topic": "mechanism",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "aligned"
+    },
+    "justification": "opus d1 and sonnet d1: top-level panes: Option<usize> written every save from the existing pane_count()."
+   },
+   {
+    "id": "c5",
+    "question": "How is the count read on scan?",
+    "topic": "mechanism",
+    "probe": {
+     "opus": "fork",
+     "sonnet": "aligned"
+    },
+    "note": "BORDERLINE, flagged: the criterial count is sensitive to this call. Opus stays in the hand-rolled-scanner family; the fork is the read structure itself.",
+    "justification": "Fable-modal: extend the hand-rolled stop-at-first-table scanner off the single whole-file read_to_string the scan already does. opus d5: replaces the whole-file read with a NEW bounded 4 KiB read_head and scans that head \u2014 a different read/control structure with observably different I/O ('never touches the tab tree even on a thirty-pane session', its own words), behaviourally divergent for any top-level key past 4 KiB. Fork by the rubric's letter; borderline because for well-formed files pinned by opus's own serialization test the semantics coincide. sonnet d6: one whole-body read serving both keys, mirrored scanner \u2014 aligned."
+   },
+   {
+    "id": "c6",
+    "question": "Unknown pane count ranks as?",
+    "topic": "compat",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "aligned"
+    },
+    "justification": "opus d3: absent count lands in the upper tier for free. sonnet d4: absent is 'unknown', never 'small', never handicapped."
+   },
+   {
+    "id": "c7",
+    "question": "Workspace-hint precedence?",
+    "topic": "policy",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "aligned"
+    },
+    "justification": "opus d2 key 1 untouched; sonnet d5: hint tier untouched and first, 'however small' honoured literally."
+   },
+   {
+    "id": "c8",
+    "question": "Does the scratch-window theme borrow share the rank?",
+    "topic": "mechanism",
+    "probe": {
+     "opus": "unaddressed",
+     "sonnet": "unaddressed"
+    },
+    "justification": "Fable-unanimous and fable-consensus cluster; neither probe arm mentions theme borrowing at all."
+   },
+   {
+    "id": "c9",
+    "question": "How is the writer/scanner coupling verified?",
+    "topic": "verification",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "unaddressed"
+    },
+    "justification": "opus d8: pins panes=31 ahead of the first [table] header by test. sonnet: names the assumption in not_done as 'inferred, not executed' and ships no pin test \u2014 a gap it declares, not a counter-decision."
+   }
+  ],
+  "t3-bell": [
+   {
+    "id": "c1",
+    "question": "What does a BEL become?",
+    "topic": "mechanism",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "fork"
+    },
+    "note": "CORRELATED with c2, flagged: both sonnet forks share one root \u2014 the stateless gate has no held claim, therefore nothing to hold through an idle debounce.",
+    "justification": "Fable-unanimous: the BEL parks/arms/defers as a claim and a later adjudication announces. opus d1: bell_verdict Ring|Hold|Drop with a held state \u2014 aligned. sonnet d1+d4: a gate AT ARRIVAL \u2014 'either guard failing drops the bell event outright (no latch, no deferred marker, no state mutation)'; pass rings immediately, fail hands the finish entirely to the scan. Gate-and-drop is a different control structure from defer-and-resolve, with materially different behaviour: the bell's speed advantage is lost whenever the gate fails. Fork."
+   },
+   {
+    "id": "c2",
+    "question": "Working-agent suppression and the idle hold (bug 1)",
+    "topic": "mechanism",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "fork"
+    },
+    "note": "CORRELATED with c1 (same stateless-gate root).",
+    "justification": "Fable-unanimous: live-screen thinking probe plus ring only after the same 300ms idle hold the scan uses. opus d3: held bell rings past the 300ms debounce, skipping the real-spell test \u2014 aligned. sonnet: agent_is_thinking probe aligned on the suppress half, but a passing bell rings IMMEDIATELY with no idle hold \u2014 the hold fable-b called 'what stops a beep landing in a redraw flicker from ringing' is absent. Fork."
+   },
+   {
+    "id": "c3",
+    "question": "How long does a parked claim survive continued work?",
+    "topic": "threshold",
+    "probe": {
+     "opus": "fork",
+     "sonnet": "unaddressed"
+    },
+    "justification": "Stage-0 fork cluster (void-at-next-tick / 10s / 5s). opus: a held bell has NO expiry \u2014 deadline rejected as a false-fire risk during long scrollback \u2014 a fourth distinct lifetime design; fork. sonnet: no parked state exists, so the question does not arise; unaddressed."
+   },
+   {
+    "id": "c4",
+    "question": "Restore-burst suppression signal (bug 2)",
+    "topic": "mechanism",
+    "probe": {
+     "opus": "fork",
+     "sonnet": "fork"
+    },
+    "agree_against_fable": false,
+    "justification": "Stage-0 three-way fork (typed-input gate / 30s observation clock / 10s spawn grace + evidence). opus d4+d5: a per-pane replay LATCH seeded from restore.resume, cleared by first keystroke or mouse-down via attend(), explicitly not a timer \u2014 a FOURTH distinct design. sonnet d1+d3: 2-second startup grace TIMER \u2014 fable-c's shape at a 5x smaller constant, and precisely the design opus d4 argues is 'defeated by a long transcript'. A FIFTH configuration. The probe arms disagree with each other, so no signature."
+   },
+   {
+    "id": "c5",
+    "question": "A repeat BEL while a finish is latched?",
+    "topic": "policy",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "unaddressed"
+    },
+    "justification": "opus d6: drops instead of re-announcing, matching the fable-unanimous choice and the scan arm's !bell guard. sonnet: gate does not consult the latch and no stance is declared."
+   },
+   {
+    "id": "c6",
+    "question": "How is the scan path kept unchanged?",
+    "topic": "mechanism",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "aligned"
+    },
+    "justification": "opus d3: 'the scan's own real path is bit-for-bit unchanged'. sonnet d5: scan and all three guards untouched."
+   },
+   {
+    "id": "c7",
+    "question": "Where does the decision logic live and how is it tested?",
+    "topic": "verification",
+    "probe": {
+     "opus": "aligned",
+     "sonnet": "aligned"
+    },
+    "justification": "opus d7: pure bell_verdict/announce_on_stop with truth-table tests in the existing idiom. sonnet d7: pure gate, three tests, live-PTY wiring declared unverified rather than faked."
+   },
+   {
+    "id": "nc-t3-docs",
+    "question": "Do the docs and changelog record the behaviour change?",
+    "topic": "presentation",
+    "new_cluster": true,
+    "verdict": "fork",
+    "members": {
+     "opus": [
+      "d8"
+     ],
+     "sonnet": [
+      "d6"
+     ]
+    },
+    "justification": "New question no fable arm raised. opus d8: Unreleased Fixed entry plus a 'A bell is a hint, not a finish' section in BELL_SOUNDS.md, 'the only written statement of the old contract'. sonnet d6: deliberately NO changelog entry, citing the two most recent commits in this feature area as precedent. Opposite declared decisions on one question: fork (non-criterial: presentation, and not a stage-0 cluster)."
+   }
+  ]
+ },
+ "new_clusters_uncontested": [
+  {
+   "ticket": "t2-adoption",
+   "id": "nc-t2-clock",
+   "topic": "verification",
+   "arm": "opus",
+   "question": "How is time made testable in rank()?",
+   "justification": "opus d6: rank/rank_at(.., now) split per the file's _at/_in convention. No other arm in either stage addressed clock injection."
+  },
+  {
+   "ticket": "t2-adoption",
+   "id": "nc-t2-changelog",
+   "topic": "presentation",
+   "arm": "opus",
+   "question": "Changelog entry for the adoption fix?",
+   "justification": "opus d9 adds one; no fable t2 arm and not sonnet declared any."
+  }
+ ]
+}

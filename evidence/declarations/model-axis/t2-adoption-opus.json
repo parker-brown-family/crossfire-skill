@@ -1,0 +1,107 @@
+{
+ "run_id": "t2-adoption-opus",
+ "ticket": "t2-adoption",
+ "base_sha": "93db4924d55c7971d5a2294e6c545b751ad0d42d",
+ "config": {
+  "model": "opus",
+  "effort": "harness-default",
+  "framing": "none",
+  "axis": "model"
+ },
+ "decided": [
+  {
+   "id": "d1",
+   "surface": "app/src/main.rs",
+   "claim": "Record the session's pane count as a new top-level `panes: Option<usize>` on StateFile, written on every save from the existing `Workspace::pane_count()` \u2014 the signal the ranking needs, reusing the same 'richness' metric the save-shrink guard already trusts."
+  },
+  {
+   "id": "d2",
+   "surface": "app/src/instance.rs",
+   "claim": "Rank on four keys \u2014 workspace hint, then a coarse recency bucket (saved within RECENT_WORK), then arranged-vs-throwaway, then mtime/id \u2014 so substance decides only among sessions that are all still current, and the abandoned-big-session failure is fenced off by construction rather than by tuning."
+  },
+  {
+   "id": "d3",
+   "surface": "app/src/instance.rs",
+   "claim": "Make the substance key a two-tier boolean (demonstrably trivial vs everything else) at TRIVIAL_PANES = 1, not an ordinal by size: an unknown count then lands in the upper tier for free, which is exactly the compatibility guarantee the ticket asks for, and no 'how big is big' threshold has to be invented."
+  },
+  {
+   "id": "d4",
+   "surface": "app/src/instance.rs",
+   "claim": "RECENT_WORK is 7 days \u2014 long enough that a weekend away cannot lose your arrangement to a scratch window, short enough to expire the 'weeks ago' case the ticket names."
+  },
+  {
+   "id": "d5",
+   "surface": "app/src/instance.rs",
+   "claim": "Read a bounded 4 KiB head of each state file once per candidate (`read_head`) and scan it twice with hand-rolled top-level extractors, replacing the previous whole-file `read_to_string`; the launch scan therefore never touches the tab tree even on a thirty-pane session."
+  },
+  {
+   "id": "d6",
+   "surface": "app/src/instance.rs",
+   "claim": "Split `rank` into `rank`/`rank_at(.., now)` so the clock is injectable, following the file's existing `legacy_master_live`/`legacy_master_live_at` and `resolve_session`/`resolve_session_in` convention; 'abandoned a month ago' becomes an assertion instead of a wait."
+  },
+  {
+   "id": "d7",
+   "surface": "app/src/instance.rs",
+   "claim": "Leave the existing tests untouched by keeping `session()`/`cand()` producing count-less fixtures and adding `session_of()`/`sized()` beside them \u2014 every pre-existing adoption test therefore doubles as a pre-upgrade compatibility test."
+  },
+  {
+   "id": "d8",
+   "surface": "app/src/main.rs",
+   "claim": "Pin the cross-module contract with a test asserting `panes = 31` is serialized ahead of the first `[table]` header, since the reader in `instance` only ever sees the file's head; a silently reordered serializer would otherwise make the whole ranking key dead."
+  },
+  {
+   "id": "d9",
+   "surface": "CHANGELOG.md",
+   "claim": "Add one `### Fixed` entry under Unreleased in the file's existing register, naming the bug, the guard against the opposite failure, and the upgrade behaviour."
+  }
+ ],
+ "least_confident": [
+  {
+   "ref": "d3",
+   "why": "TRIVIAL_PANES = 1 is the narrowest possible reading of 'throwaway'. A scratch window someone splits once (2 panes) is no longer demoted and the reported bug returns in that shape. Widening it starts demoting small-but-real sessions, so I chose the conservative end, but the right threshold is a usage question I cannot settle by reading."
+  },
+  {
+   "ref": "d4",
+   "why": "7 days is a judgement call with a hard cliff at the edge: an arrangement saved 6 days ago beats a 2-pane session saved yesterday, which some users would call the opposite bug at a smaller scale. A decayed score would be smoother but is not a total order in the sense `sort_by` requires, so I kept the bucket."
+  },
+  {
+   "ref": "d5",
+   "why": "The 4 KiB head is only correct while every ranking scalar precedes the first `[table]`. That is what toml 0.8 does today and what `last_workspace` already relied on, and d8 pins it \u2014 but it is an assumption about a dependency's emit order, not something the type system enforces."
+  }
+ ],
+ "not_done": [
+  {
+   "claim": "Nothing was compiled, tested, formatted or linted.",
+   "why": "Builds are out of scope for this exercise. So `cargo test`, `cargo clippy -- -D warnings` and `cargo fmt --check` (all three gate CI here) are unverified; I hand-checked line widths against the 100-column default and wrote the new tests in the shape I believe rustfmt emits, but formatting drift is the most likely defect in this diff."
+  },
+  {
+   "claim": "The `panes` field is never read back at runtime by the window itself.",
+   "why": "Only the launch scan reads it, off the raw file text. `StateFile::panes` therefore round-trips and is otherwise dead \u2014 deliberate, but it means a mistake in `build_state` would be invisible to everything except adoption."
+  },
+  {
+   "claim": "No fallback substance signal for pre-upgrade files (e.g. state-file size as a pane-count proxy).",
+   "why": "Considered and rejected: file size also tracks theme and group blobs, so the threshold would be a guess. The ticket only requires that unknown is not demoted, which the two-tier key gives directly."
+  },
+  {
+   "claim": "Tab count is not recorded or ranked, only panes.",
+   "why": "A one-pane session is necessarily a one-tab session, so panes alone separates the throwaway case. A session with many tabs of one pane each is already non-trivial by pane count."
+  },
+  {
+   "claim": "No migration writes a count into existing state files.",
+   "why": "Unnecessary \u2014 the first save of each session records one, and until then unknown ranks safely. A migration would have to open and parse every session file at launch, which is what the ticket forbids."
+  },
+  {
+   "claim": "End-to-end behaviour on a real desktop is unverified.",
+   "why": "The story involves a compositor, a second window, and a close; only the file-level path (`adopt_or_fresh` over real state files) is covered by tests. Whether `pane_count()` reports what a user would call 'thirty panes' at save time, and whether a closing scratch window saves at all before it exits, both need the running app."
+  },
+  {
+   "claim": "Scratch-window theme inheritance (`theme_key_in`) now follows the new ranking, and that behaviour change is untested beyond the existing test.",
+   "why": "It shares `rank`, so a tear-off now borrows the look of the arranged session rather than the newest throwaway. I judged that an improvement rather than a regression, but I did not add a test asserting the new preference."
+  }
+ ],
+ "cost": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "wall_clock_s": 0
+ }
+}

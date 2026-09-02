@@ -1,0 +1,106 @@
+{
+ "run_id": "t1-reveal-sonnet",
+ "ticket": "t1-reveal",
+ "base_sha": "126bdbd5464bfdacf249ebda43ea6fe18e0a1c78",
+ "config": {
+  "model": "sonnet",
+  "effort": "harness-default",
+  "framing": "none",
+  "axis": "model"
+ },
+ "decided": [
+  {
+   "id": "d1",
+   "surface": "app/src/pane.rs",
+   "claim": "Reveal via the FreeDesktop org.freedesktop.FileManager1.ShowItems DBus method (Nautilus/Nemo/Caja and similar), shelled out through dbus-send rather than adding a DBus client crate; on failure (no bus, no dbus-send, unsupporting file manager) fall back to opening the parent directory with the existing open_with_system."
+  },
+  {
+   "id": "d2",
+   "surface": "app/src/pane.rs",
+   "claim": "reveal_with_system runs the dbus-send call and its fallback on a plain std::thread::spawn background thread rather than cx.background_executor(), so it stays a free function with no Context dependency, callable identically from the mouse handler and the context menu, matching this file's existing std::thread::spawn idiom for detached blocking work."
+  },
+  {
+   "id": "d3",
+   "surface": "app/src/pane.rs",
+   "claim": "Super+Ctrl-click is ev.modifiers.platform && ev.modifiers.control (verified against gpui's Modifiers struct, where platform is documented as 'the super key, on linux'), checked ahead of the existing Shift/Ctrl branch; a click with nothing to reveal falls through to that branch unchanged so Ctrl alone still opens. Shift's state is not part of the reveal test."
+  },
+  {
+   "id": "d4",
+   "surface": "app/src/pane.rs",
+   "claim": "file_uri_to_path only resolves a reveal target when the URI's authority is empty or localhost; any other host is treated as not on this disk and yields None, never attempting a reveal or a fallback open."
+  },
+  {
+   "id": "d5",
+   "surface": "app/src/pane.rs",
+   "claim": "Hand-rolled percent_decode/percent_encode_path instead of a new crate dependency (no percent-encoding/url crate is in Cargo.toml); the encoder also escapes ',' because dbus-send's own array:string: argument syntax splits array elements on an unescaped comma."
+  },
+  {
+   "id": "d6",
+   "surface": "app/src/pane.rs",
+   "claim": "Factored link_under's grid-walk-and-classify logic out into classify_link_under so the new reveal_under reuses the identical click-to-token-to-Link pipeline instead of re-deriving it; link_under's own behaviour is unchanged."
+  },
+  {
+   "id": "d7",
+   "surface": "app/src/pane.rs",
+   "claim": "Added a 'Reveal in file manager  \u2197' row directly beneath 'Open link  \u2197' in the right-click menu, shown only when reveal_under resolves for the position the menu opened at, so a web URL still offers only Open."
+  },
+  {
+   "id": "d8",
+   "surface": "app/src/pane.rs",
+   "claim": "Built the dbus-send argv with Command::args(Vec<String>), never a shell string, so no path or filename content is ever interpreted by a shell -- this, not ad hoc escaping, is what makes spaces/commas/other awkward characters safe."
+  }
+ ],
+ "least_confident": [
+  {
+   "ref": "d1",
+   "why": "ShowItems is my best knowledge of the standard cross-desktop reveal mechanism (it's what VS Code uses on Linux), but there is no running D-Bus session or file manager in this sandbox to confirm it actually selects the item, or that dbus-send's exit code is non-zero on every failure mode the fallback relies on."
+  },
+  {
+   "ref": "d3",
+   "why": "The platform field is confirmed correct for Super from gpui's own source, but several Linux compositors/window managers reserve bare Super or Super+chord combinations for their own global shortcuts before an app's window ever sees the event -- untestable without a live compositor session."
+  },
+  {
+   "ref": "d4",
+   "why": "Treating a non-empty, non-localhost file:// authority as unrevealable is a judgment call with no evidence either way of what an agent's Links table would ever print there, since it always names the same machine the pane runs on."
+  }
+ ],
+ "not_done": [
+  {
+   "claim": "No build or test run against this change (rustc/cargo).",
+   "why": "Builds are out of scope for this exercise per the task rules; correctness of types, borrows and trait bounds rests on manual review only."
+  },
+  {
+   "claim": "The DBus ShowItems reveal path is unverified against a live file manager (Nautilus/Nemo/Caja/etc.) and session bus.",
+   "why": "Needs a running desktop/compositor session, which this exercise doesn't have."
+  },
+  {
+   "claim": "The xdg-open-on-parent-directory fallback is unverified live.",
+   "why": "Needs a real desktop session with a default file-manager handler registered."
+  },
+  {
+   "claim": "Whether Super+Ctrl actually reaches the pane, versus being grabbed by the window manager/compositor as a global shortcut, is unverified.",
+   "why": "Needs a live compositor session -- exactly the kind of thing the brief says to leave untested."
+  },
+  {
+   "claim": "A bare absolute path containing a literal, un-encoded space in the printed terminal text is still not detected as a link at all.",
+   "why": "Pre-existing limitation of link_at's whitespace tokenizer, which this ticket says to build on rather than re-derive; fixing it means redesigning token-boundary detection, disproportionate to this ask. The brief's own space example is satisfied for the shape agents actually print one in -- a file:// URI with %20."
+  },
+  {
+   "claim": "ftp://, ftps:// and mailto: links are treated as non-revealable, same as http(s).",
+   "why": "Only 'a bare absolute path and a file:// URI' are named as target shapes in the brief; erred toward not offering reveal on anything not explicitly in scope rather than guessing at ftp-as-local-path semantics."
+  },
+  {
+   "claim": "No on-screen legend/help text documents the new Super+Ctrl chord.",
+   "why": "No such legend exists today for the pre-existing Shift/Ctrl-click either, so none was added for parity."
+  },
+  {
+   "claim": "Cross-distro availability of the dbus-send binary itself is assumed, not verified in this sandbox.",
+   "why": "It ships in the standard dbus package on essentially every Linux desktop, matching how the codebase already assumes xdg-open/notify-send are present; no live check was run."
+  }
+ ],
+ "cost": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "wall_clock_s": 0
+ }
+}

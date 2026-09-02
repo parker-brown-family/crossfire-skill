@@ -1,0 +1,84 @@
+{
+ "run_id": "t3-bell-a",
+ "ticket": "t3-bell",
+ "base_sha": "324215bcf30f07e9c7f6d6a7633b437d496bae8b",
+ "config": {
+  "model": "fable-5",
+  "effort": "session-default",
+  "framing": "none",
+  "axis": "same-config"
+ },
+ "decided": [
+  {
+   "id": "d1",
+   "surface": "app/src/pane.rs",
+   "claim": "A BEL never rings the finish directly any more: TermEvent::Bell only arms a bell_pending timestamp, and the existing 120ms scroll-settled scan adjudicates it against the live screen on its next ticks."
+  },
+  {
+   "id": "d2",
+   "surface": "app/src/pane.rs",
+   "claim": "Adjudication rule: an observed thinking state voids the pending bell (the agent is demonstrably still working \u2014 the scrollback-boundary-beep case); not-thinking that holds through a 300ms confirm window (BELL_CONFIRM, mirroring the scan's own not-thinking debounce) rings it, deliberately without the scan edge's >1200ms real-spell test, so a fast genuine turn's announcement is delayed rather than lost."
+  },
+  {
+   "id": "d3",
+   "surface": "app/src/pane.rs",
+   "claim": "The restore burst is killed by a typed-input gate: a BEL arms only when human_typed is set, which only send() (the funnel every real keystroke takes) sets \u2014 the injected resume command, wheel-to-arrow translation, prompt-seek walker, focus reports, and paste-without-Enter deliberately do not count \u2014 and the gate re-closes on every ring so an idle TUI's stray beeps after an acknowledged finish stay silent until the human starts another turn."
+  },
+  {
+   "id": "d4",
+   "surface": "app/src/pane.rs",
+   "claim": "Factored one ring_finish() shared by the scan edge and the adjudicated BEL so every finish surface (bell latch, blocked/clean classification off the same recent rows, ping, AgentDone emit) stays in lockstep; the scan path's announcing conditions and output are otherwise preserved exactly."
+  },
+  {
+   "id": "d5",
+   "surface": "app/src/pane.rs",
+   "claim": "A BEL arriving while a finish is already latched unacknowledged is swallowed instead of re-ringing (previously it replayed the sound and re-emitted AgentDone), for parity with the scan edge's !bell guard."
+  },
+  {
+   "id": "d6",
+   "surface": "app/src/pane.rs",
+   "claim": "The verdict logic is a pure function, adjudicate_bell(armed_for, thinking, bell_latched) -> BellVerdict {Hold, Void, Ring}, placed with the file's other pure heuristics and unit-tested for the full matrix including the confirm-window boundary; the stateful arming and clock wiring stay in the pane."
+  }
+ ],
+ "least_confident": [
+  {
+   "ref": "d2",
+   "why": "If the thinking heuristic reads stuck-true \u2014 an agent whose finished screen literally contains 'esc to interrupt', e.g. an agent developing this very repo \u2014 pending bells are voided forever and the old accidental rescue (instant BEL ring) is gone, so that exotic state now loses the announcement; I judged it acceptable because the pulse/scan surfaces are already wrong in that state and the stance ranks a false ring worse than a delayed or even lost one, but reasonable people could weigh it the other way."
+  },
+  {
+   "ref": "d3",
+   "why": "Counting only send() assumes every real submission ends with an Enter keystroke through that funnel (paste alone never starts a turn); and because the gate closes on ring, a queued follow-on turn that finishes while the previous bell is still latched depends on the CLI emitting another BEL or the scan edge catching it \u2014 consistent with the scan path's existing back-to-back collapse, but not verified against a live agent."
+  },
+  {
+   "ref": "d5",
+   "why": "Someone may have relied on repeat BELs re-playing the ping for an unacknowledged finish (a louder summons); I removed that on the grounds that the scan edge never re-rings and a duplicate notification is noise, but it is a product-feel call made without a product owner."
+  }
+ ],
+ "not_done": [
+  {
+   "claim": "No build, test, clippy, or formatter run \u2014 compilation of the change is unverified.",
+   "why": "The exercise forbids running cargo; everything was verified by reading (brace balance, scopes, borrow shapes, call sites) only."
+  },
+  {
+   "claim": "End-to-end behaviour (scrollback beep during a live turn, the restore replay burst, a genuine fast-turn BEL, the needs-input-flavoured notification arriving via the delayed ring) is unverified.",
+   "why": "These need a live PTY and a real agent CLI; the pure verdict function is unit-tested, but the arming gate, the human_typed funnel, and the effects-clock wiring are not testable in isolation in this codebase's current shape."
+  },
+  {
+   "claim": "The screen-scan heuristic and its guards are untouched, including its known holes (settle gate blind to alt-screen scrolls; 'esc to interrupt' as literal screen content reading as thinking).",
+   "why": "The ticket pins the scan path's current behaviour; the BEL path was aligned to it, not the other way round."
+  },
+  {
+   "claim": "BELL_SOUNDS.md not updated.",
+   "why": "It documents the killed v1 per-pane sound system and was already stale before this change; a doc refresh was not in the ask and would widen the diff."
+  },
+  {
+   "claim": "ack_bell does not clear bell_pending.",
+   "why": "Latched-plus-pending is unreachable (the arm gate refuses arming while latched, and ring_finish disarms), and a pending bell surviving a focus change intentionally mirrors how a post-focus scan ring behaves today; the belt-and-braces Void verdict covers the impossible case anyway."
+  }
+ ],
+ "cost": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "wall_clock_s": 0
+ }
+}

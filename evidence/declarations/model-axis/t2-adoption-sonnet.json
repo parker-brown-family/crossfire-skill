@@ -1,0 +1,94 @@
+{
+ "run_id": "t2-adoption-sonnet",
+ "ticket": "t2-adoption",
+ "base_sha": "93db4924d55c7971d5a2294e6c545b751ad0d42d",
+ "config": {
+  "model": "sonnet",
+  "effort": "harness-default",
+  "framing": "none",
+  "axis": "model"
+ },
+ "decided": [
+  {
+   "id": "d1",
+   "surface": "app/src/main.rs",
+   "claim": "Reused the existing pane-count 'richness' metric (the same notion `count_saved_leaves`/`pane_count` already compute for the shrink guard) as the size signal, persisted as a new top-level `panes: Option<usize>` scalar on `StateFile`, written every save from `build_state`."
+  },
+  {
+   "id": "d2",
+   "surface": "app/src/instance.rs",
+   "claim": "A session is 'trivial' (TRIVIAL_PANES) at 1 pane or fewer \u2014 the exact one-pane throwaway from the ticket's own story \u2014 not some larger cutoff."
+  },
+  {
+   "id": "d3",
+   "surface": "app/src/instance.rs",
+   "claim": "Implemented the ask as a bounded recency handicap (TRIVIAL_HANDICAP = 30 minutes) applied only to trivial sessions' sort key (`ranking_time`), rather than a standing size-weighted score. This satisfies both halves of the ticket: a throwaway needs 30 minutes of extra apparent age to beat a substantial session (fixes the reported bug), but a substantial session more than 30 minutes stale still loses to current work of any size (guards the opposite failure), since the handicap never helps a non-trivial session and never grows with age."
+  },
+  {
+   "id": "d4",
+   "surface": "app/src/instance.rs",
+   "claim": "`is_trivial` treats an absent `panes` (pre-upgrade files) as 'unknown', never as 'small' \u2014 so it is never handicapped and ranks purely on recency, exactly as before the ticket. Satisfies the stated compatibility requirement without any migration step."
+  },
+  {
+   "id": "d5",
+   "surface": "app/src/instance.rs",
+   "claim": "Left the workspace-hint tier (`mine`) in `rank` completely untouched and first in sort precedence; the handicap only affects the recency tie-break beneath it, so a trivial session standing on `here` still wins outright, matching the ticket's 'stays the strongest key, however small' requirement literally."
+  },
+  {
+   "id": "d6",
+   "surface": "app/src/instance.rs",
+   "claim": "Kept the scan cheap: added `toml_top_level_uint`, a hand-rolled line scanner mirroring the existing `toml_top_level_string`, and changed `scan_sessions` to read each session file's body once and derive both `last_workspace` and `panes` from it (previously `last_workspace` alone triggered its own read) \u2014 no whole-file TOML deserialization, and one fewer read than before per session."
+  },
+  {
+   "id": "d7",
+   "surface": "test helpers",
+   "claim": "Did not change the signatures of the existing `cand`/`session` test helpers (used by ~10 pre-existing tests); added `cand_sized`/`session_sized` siblings instead, so every pre-existing test is untouched byte-for-byte except the one added `panes: None` field line each construction site needed to keep compiling."
+  },
+  {
+   "id": "d8",
+   "surface": "app/src/instance.rs",
+   "claim": "Added 5 new tests: the ticket's story and the opposite-failure guard as pure `rank()` unit tests, a compatibility test for unrecorded pane counts, a test that the workspace hint still overrides size, and one filesystem-level test through `adopt_or_fresh`/`scan_sessions` exercising the real TOML line-scan end to end."
+  }
+ ],
+ "least_confident": [
+  {
+   "ref": "d3",
+   "why": "TRIVIAL_HANDICAP=30min and TRIVIAL_PANES<=1 are judgment calls the ticket doesn't pin a number to. They satisfy the two named scenarios ('a minute later' vs 'weeks ago') with wide margin, but a real deployment might want either tuned, and I have no way to test-drive the value against real usage patterns."
+  },
+  {
+   "ref": "d3",
+   "why": "The handicap is a step function: a 1-pane session gets the full 30-minute penalty and a 2-pane session gets none. A graduated discount (scaling with how few panes, or how much smaller than the competing candidate) would avoid that cliff but is meaningfully more complex than the ticket's ask seems to call for; I chose the simpler rule and could be wrong about which side of that trade-off this codebase would prefer."
+  },
+  {
+   "ref": "d1",
+   "why": "Pane count alone (not tab count) is the size signal, following the existing `count_saved_leaves` precedent. The ticket's own story leads with tab count ('a dozen tabs, thirty panes'); a session with many sparse tabs but few panes would read as trivial under my rule even though a user might consider it substantial."
+  }
+ ],
+ "not_done": [
+  {
+   "claim": "Nothing was compiled, linted, or run \u2014 no cargo build/test/fmt/clippy, per the exercise rules. All field additions, the two hand-rolled TOML scanners, the sort-key logic, and all 5 new tests are verified only by hand-reading, not execution.",
+   "why": "Out of scope for this exercise; this is the single largest source of risk in the diff."
+  },
+  {
+   "claim": "The claim that `toml::to_string` (toml crate 0.8, confirmed in app/Cargo.toml) emits all scalar StateFile fields before any `[table]` sections regardless of struct declaration order \u2014 which is what lets a late-declared `panes: Option<usize>` still land in the top-level table `scan_sessions` can line-scan \u2014 is inferred from the pre-existing `last_workspace` field behaving the same way and from general knowledge of the toml crate's serializer, not observed by running it.",
+   "why": "No build available; this is the load-bearing assumption behind d1/d6 and is the first thing I'd check with `cargo test state_with_pane_theme_round_trips` or similar."
+  },
+  {
+   "claim": "Did not add any user-facing configuration for TRIVIAL_PANES or TRIVIAL_HANDICAP; both are fixed consts.",
+   "why": "Matches the file's existing style (MAX_SESSIONS, IPC_TIMEOUT, WORKSPACE_TTL are all hardcoded consts) and the ticket did not ask for tunability."
+  },
+  {
+   "claim": "Did not touch ctl.rs (the external/MCP control-surface) to expose the new `panes` signal or ranking behaviour.",
+   "why": "Out of scope \u2014 the ticket is about the adoption scan, not the control surface."
+  },
+  {
+   "claim": "Did not re-verify that `is_catastrophic_shrink`/`persist_primary_state` (the existing shrink guard, which reads panes/tabs from the saved `SavedNode` tree via `count_saved_leaves`) are unaffected by the new `panes` scalar field.",
+   "why": "They read size from a different, pre-existing code path (the deserialized tab tree) and never reference the new field, so I'm confident they're independent, but this was reasoned rather than tested."
+  }
+ ],
+ "cost": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "wall_clock_s": 0
+ }
+}

@@ -1,0 +1,106 @@
+{
+ "run_id": "t1-reveal-opus",
+ "ticket": "t1-reveal",
+ "base_sha": "126bdbd5464bfdacf249ebda43ea6fe18e0a1c78",
+ "config": {
+  "model": "opus",
+  "effort": "harness-default",
+  "framing": "none",
+  "axis": "model"
+ },
+ "decided": [
+  {
+   "id": "d1",
+   "surface": "app/src/pane.rs",
+   "claim": "Reveal goes through the org.freedesktop.FileManager1.ShowItems session-bus method rather than probing for a specific file manager: it is the one contract Nautilus, Dolphin, Nemo, Caja, Thunar, PCManFM-Qt and elementary Files all export, and D-Bus activation starts whichever one the desktop actually has."
+  },
+  {
+   "id": "d2",
+   "surface": "app/src/pane.rs",
+   "claim": "Three legs in order \u2014 gdbus, then dbus-send with --print-reply, then a degrade to xdg-open on the containing DIRECTORY (unselected but not silent) \u2014 and the whole chain runs on a detached std::thread, because deciding whether to try the next leg means waiting on the previous one, which the UI thread may not do."
+  },
+  {
+   "id": "d3",
+   "surface": "app/src/pane.rs",
+   "claim": "The path is percent-encoded into a file:// URI by path_to_file_uri before it reaches any argv; that is both the form ShowItems takes and what leaves no space, quote or backslash in the gdbus GVariant literal, so awkward names need no separate escaping layer."
+  },
+  {
+   "id": "d4",
+   "surface": "app/src/pane.rs",
+   "claim": "One pure function, link_local_path, decides revealability over whatever link_under already produced (a resolved absolute path, or a file:// URI); a web URL yields None, and that single None is what keeps reveal off http links at both call sites. A file:// URI with a non-empty, non-localhost authority is refused as a remote share."
+  },
+  {
+   "id": "d5",
+   "surface": "app/src/pane.rs",
+   "claim": "The Super+Ctrl branch is tested BEFORE the existing Shift-/Ctrl-click open branch in on_mouse_down, since Ctrl is held for both and the open branch would otherwise swallow the chord; a Super+Ctrl-click on a non-revealable link falls through to the existing open behaviour rather than doing nothing."
+  },
+  {
+   "id": "d6",
+   "surface": "app/src/pane.rs",
+   "claim": "The right-click menu's \"Reveal in file manager\" row is emitted only when revealable_path returns Some, is computed before the link String moves into the Open listener, and carries a hardcoded English label like its Copy/Paste/Open siblings \u2014 those labels are not routed through lang.rs."
+  },
+  {
+   "id": "d7",
+   "surface": "app/src/lang.rs",
+   "claim": "The chord is made discoverable in the help modal's LINKS section, which the repo's idiom prices at two new Strings keys (k_super_ctrl_click, reveal_link) filled in for all nine languages; a chord in no help modal is a hidden feature."
+  },
+  {
+   "id": "d8",
+   "surface": "CHANGELOG.md",
+   "claim": "Recorded as a user-visible feature in [Unreleased]/Added, and the info.html kiosk's Terminal-core bullet list updated to name the reveal chord and the new menu entry."
+  }
+ ],
+ "least_confident": [
+  {
+   "ref": "d2",
+   "why": "The dbus-send leg rests on reasoning I could not execute: without --print-reply dbus-send fires and forgets and exits 0 even with nothing listening, which would swallow the degrade, so I added it \u2014 but I never ran either command. I am also unsure a second D-Bus client earns its place at all rather than going straight from gdbus to the degrade."
+  },
+  {
+   "ref": "d5",
+   "why": "Super+Ctrl-click on an http link currently OPENS it, because it falls through into the Shift-/Ctrl branch. I read the brief's \"it keeps the existing open behaviour\" as sanctioning that, but a reader could just as reasonably expect the reveal chord to do nothing at all on a web URL."
+  },
+  {
+   "ref": "d7",
+   "why": "Nine translations are mine and unreviewed, and the whole help-modal row is arguably past what a ticket asking for a chord and a menu entry wanted \u2014 it is the largest piece of the diff that nobody asked for."
+  }
+ ],
+ "not_done": [
+  {
+   "claim": "Nothing was compiled, tested, formatted or linted \u2014 no cargo check, test, fmt or clippy.",
+   "why": "Builds are out of scope for this exercise, so every claim about compilation, rustfmt shape and test outcomes rests on reading only. The three new tests have never run."
+  },
+  {
+   "claim": "The reveal itself is unverified end to end.",
+   "why": "No compositor or desktop session here, so ShowItems was never exercised against a real file manager, the degrade never fired, and the item-selected behaviour for a directory target was never observed."
+  },
+  {
+   "claim": "Whether the compositor delivers Super+Ctrl+LeftClick to the window at all is unverified.",
+   "why": "Hyprland/Omarchy binds Super+LMB to move-window. Super+Ctrl should not match that exact modmask, but I could not test it, and if it is swallowed the chord is dead on the repo's own primary desktop."
+  },
+  {
+   "claim": "gpui's mapping of the Super key onto Modifiers::platform on X11/Wayland was not read at the source.",
+   "why": "The gpui checkout is a sibling path not present in this tree; I inferred it from in-repo usage (paint_key's `plain` test excludes control/alt/platform)."
+  },
+  {
+   "claim": "A bare absolute path containing a space still cannot be revealed.",
+   "why": "link_at tokenises on whitespace and never sees such a path as one link \u2014 pre-existing, and widening it is a different change. Only the file:// shape carries a space through, which the tests cover."
+  },
+  {
+   "claim": "lang.rs's `rclick` summary (\"Copy \u00b7 Paste \u00b7 Open link \u00b7 Clear\") was not extended to name Reveal.",
+   "why": "The entry is conditional on the link being local, the line is already long, and it would have cost nine more translations for a summary rather than an affordance."
+  },
+  {
+   "claim": "No hover affordance, cursor change, or OSC-8 hyperlink handling for the reveal chord.",
+   "why": "Not asked for, and the existing open chord has none either \u2014 adding one only for reveal would make the pair inconsistent."
+  },
+  {
+   "claim": "revealable_path stats the filesystem on every render frame while the context menu is open.",
+   "why": "It matches what link_under already does on the same path in the same closure, so it changes no cost profile, but it is unmeasured."
+  }
+ ],
+ "cost": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "wall_clock_s": 0
+ }
+}

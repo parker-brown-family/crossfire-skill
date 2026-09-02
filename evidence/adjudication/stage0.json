@@ -1,0 +1,567 @@
+{
+ "_what": "Claim-level adjudication of the nine stage-0 declarations, per the rubric pre-registered at the rubric in evidence/METHOD.md. Clusters group claims across arms that answer the same design question; verdicts follow the mechanical criteria: fork = different interface/signal/shape or same shape with a constant differing >=2x; same = wording or incidental detail; complementary = disjoint non-conflicting aspects. Retro-tagging is ADJUDICATOR-APPLIED, not arm-declared. Adjudicator wrote the briefs, read the real fixes, and saw stage-0's numbers; every verdict therefore quotes its evidence so it can be re-run by a disagreeing reader.",
+ "adjudicated": "2026-09-02",
+ "rubric": "the rubric in evidence/METHOD.md",
+ "lc_primary_note": "least_confident consensus maps each referenced claim to the single cluster where it is that arm's principal statement; the mapping is recorded per cluster in 'lc_members'.",
+ "tickets": {
+  "t1-reveal": [
+   {
+    "id": "c1",
+    "question": "How is reveal performed?",
+    "topic": "mechanism",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d1"
+     ],
+     "b": [
+      "d2"
+     ],
+     "c": [
+      "d1"
+     ]
+    },
+    "lc_members": {
+     "a": "d1",
+     "b": "d2",
+     "c": "d1"
+    },
+    "justification": "All three: org.freedesktop.FileManager1.ShowItems via CLI shell-out (no dbus crate), degrade to opening the containing directory. CLI try-order differs (a/b: dbus-send first; c: gdbus first, no busctl leg) - same interface, same chain structure, incidental order."
+   },
+   {
+    "id": "c2",
+    "question": "Where does the reveal errand execute?",
+    "topic": "mechanism",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d2"
+     ],
+     "b": [
+      "d3"
+     ],
+     "c": [
+      "d6"
+     ]
+    },
+    "justification": "All three: a spawned std::thread does the waiting; the UI thread never blocks. c frames it as 'throwaway thread that waits' vs open_with_system's detached process - same runtime behaviour."
+   },
+   {
+    "id": "c3",
+    "question": "Which file:// authorities count as local?",
+    "topic": "mechanism",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d3"
+     ],
+     "b": [
+      "d5"
+     ],
+     "c": [
+      "d3"
+     ]
+    },
+    "justification": "All three: empty or 'localhost' only; any other host refused."
+   },
+   {
+    "id": "c4",
+    "question": "Malformed %-escapes?",
+    "topic": "mechanism",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d7"
+     ],
+     "b": [
+      "d5"
+     ],
+     "c": [
+      "d3"
+     ]
+    },
+    "justification": "All three decode malformed escapes literally rather than rejecting the link."
+   },
+   {
+    "id": "c5",
+    "question": "Non-UTF-8 bytes in a decoded path?",
+    "topic": "mechanism",
+    "verdict": "fork",
+    "members": {
+     "a": [
+      "d3"
+     ],
+     "b": [
+      "d5"
+     ],
+     "c": [
+      "d3"
+     ]
+    },
+    "justification": "a: 'byte-level %XX decoding into an OsString so spaces and non-UTF-8 names survive'. b: 'non-UTF-8 decodes are refused'. c: 'strict-UTF-8 percent-decoder... non-UTF-8 rejected'. Different data shape (OsString vs String), materially different behaviour on non-UTF-8 names."
+   },
+   {
+    "id": "c6",
+    "question": "query/fragment on a printed file:// URI?",
+    "topic": "mechanism",
+    "verdict": "fork",
+    "members": {
+     "a": [
+      "d7"
+     ],
+     "c": [
+      "d3"
+     ]
+    },
+    "lc_members": {
+     "a": "d7"
+    },
+    "justification": "a: 'query/fragment are NOT stripped... likelier a literal character of a filename'. c: '?query/#fragment are stripped'. Opposite handling; file:///x#y resolves to different targets. b silent."
+   },
+   {
+    "id": "c7",
+    "question": "Outgoing URI percent-encoding alphabet?",
+    "topic": "mechanism",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d5"
+     ],
+     "b": [
+      "d1"
+     ],
+     "c": [
+      "d2"
+     ]
+    },
+    "justification": "a and c: escape everything outside unreserved+'/' specifically to stay inert in dbus-send/gdbus grammars; b commits to a hand-rolled encoder without stating the alphabet - no conflict."
+   },
+   {
+    "id": "c8",
+    "question": "How is the reveal target classified and gated?",
+    "topic": "mechanism",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d3"
+     ],
+     "b": [
+      "d1"
+     ],
+     "c": [
+      "d4"
+     ]
+    },
+    "justification": "All three: a pure classifier over the existing link machinery, gated on the decoded path existing on disk, shared by chord and menu. c's link_token_under/reveal_path_under split is factoring, not behaviour."
+   },
+   {
+    "id": "c9",
+    "question": "Chord placement and fall-through?",
+    "topic": "mechanism",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d4"
+     ],
+     "b": [
+      "d4"
+     ],
+     "c": [
+      "d5"
+     ]
+    },
+    "lc_members": {
+     "a": "d4",
+     "b": "d4",
+     "c": "d5"
+    },
+    "justification": "All three: Super+Ctrl checked before the Shift/Ctrl open chord because it contains Ctrl; non-revealable targets fall through to the ordinary open."
+   },
+   {
+    "id": "c10",
+    "question": "Localise the context-menu row?",
+    "topic": "presentation",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d6"
+     ],
+     "b": [
+      "d6"
+     ],
+     "c": [
+      "d7"
+     ]
+    },
+    "justification": "All three: hardcoded English, matching the menu's unlocalised siblings."
+   },
+   {
+    "id": "c11",
+    "question": "Help-modal discoverability?",
+    "topic": "presentation",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d6"
+     ],
+     "b": [
+      "d7"
+     ],
+     "c": [
+      "d8"
+     ]
+    },
+    "lc_members": {
+     "b": "d7",
+     "c": "d8"
+    },
+    "justification": "All three: a LINKS-section row, new strings across all nine language tables, self-written translations."
+   },
+   {
+    "id": "c12",
+    "question": "Changelog entry?",
+    "topic": "presentation",
+    "verdict": "same",
+    "members": {
+     "b": [
+      "d8"
+     ],
+     "c": [
+      "d8"
+     ]
+    },
+    "justification": "b and c both add an Unreleased/Added entry; a wrote none and declared none (visible in the file-grain metric as the only file-set difference)."
+   }
+  ],
+  "t2-adoption": [
+   {
+    "id": "c1",
+    "question": "What rule demotes a trivial session?",
+    "topic": "policy",
+    "verdict": "fork",
+    "members": {
+     "a": [
+      "d1"
+     ],
+     "b": [
+      "d2",
+      "d3"
+     ],
+     "c": [
+      "d2"
+     ]
+    },
+    "lc_members": {
+     "a": "d1",
+     "b": "d3",
+     "c": "d2"
+    },
+    "justification": "a: 'handicapped save time, not an absolute tier'. b: 'one tier between the workspace hint and recency... still in play... within SUBSTANCE_WINDOW'. c: 'effective save time rather than a hard tier'. Handicap (a,c) vs bounded tier (b) are different control structures with observably different orderings (e.g. a 2-day-old wall vs a 1-day-old throwaway)."
+   },
+   {
+    "id": "c2",
+    "question": "The demotion constant",
+    "topic": "threshold",
+    "verdict": "fork",
+    "members": {
+     "a": [
+      "d4"
+     ],
+     "b": [
+      "d4"
+     ],
+     "c": [
+      "d2"
+     ]
+    },
+    "lc_members": {
+     "a": "d4",
+     "b": "d4"
+    },
+    "justification": "a: TRIVIAL_HANDICAP = 72h. c: TRIVIAL_HANDICAP = 7 days. b: SUBSTANCE_WINDOW = 7 days. 72h vs 168h = 2.33x >= 2x - fork by the constant rule even between the two same-shape arms."
+   },
+   {
+    "id": "c3",
+    "question": "What counts as trivial?",
+    "topic": "threshold",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d4"
+     ],
+     "b": [
+      "d2"
+     ],
+     "c": [
+      "d3"
+     ]
+    },
+    "lc_members": {
+     "c": "d3"
+    },
+    "justification": "All three: panes <= 1 is trivial; two panes is already arranged."
+   },
+   {
+    "id": "c4",
+    "question": "How is substance recorded?",
+    "topic": "mechanism",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d2"
+     ],
+     "b": [
+      "d1"
+     ],
+     "c": [
+      "d1"
+     ]
+    },
+    "justification": "All three: a top-level `panes = N` scalar written beside last_workspace at save time from the existing pane_count()."
+   },
+   {
+    "id": "c5",
+    "question": "How is the count read on scan?",
+    "topic": "mechanism",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d6"
+     ],
+     "b": [
+      "d6"
+     ],
+     "c": [
+      "d5"
+     ]
+    },
+    "justification": "All three: extend the hand-rolled stop-at-first-table line scanner off the single read_to_string the scan already does; no deserialisation. a's shared-helper refactor is factoring."
+   },
+   {
+    "id": "c6",
+    "question": "Unknown pane count ranks as?",
+    "topic": "compat",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d3"
+     ],
+     "b": [
+      "d5"
+     ],
+     "c": [
+      "d4"
+     ]
+    },
+    "justification": "All three: missing key reads as substantial/arranged, so pre-upgrade files are never demoted - the polarity choice."
+   },
+   {
+    "id": "c7",
+    "question": "Workspace-hint precedence?",
+    "topic": "policy",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d5"
+     ],
+     "b": [
+      "d2"
+     ],
+     "c": [
+      "d6"
+     ]
+    },
+    "justification": "All three: the hint stays the untouched first key; the new rule operates only beneath it."
+   },
+   {
+    "id": "c8",
+    "question": "Does the scratch-window theme borrow share the rank?",
+    "topic": "mechanism",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d8"
+     ],
+     "b": [
+      "d7"
+     ],
+     "c": [
+      "d7"
+     ]
+    },
+    "lc_members": {
+     "a": "d8",
+     "b": "d7",
+     "c": "d7"
+    },
+    "justification": "All three: keep resolve_key/theme_key_in on the shared rank() - 'one ranking doctrine rather than two'."
+   },
+   {
+    "id": "c9",
+    "question": "How is the writer/scanner coupling verified?",
+    "topic": "verification",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d7"
+     ],
+     "b": [
+      "d8"
+     ]
+    },
+    "justification": "a and b both pin, by test, that toml 0.8 emits the top-level hints ahead of the first table header. c's test list does not include the serialisation-order pin."
+   }
+  ],
+  "t3-bell": [
+   {
+    "id": "c1",
+    "question": "What does a BEL become?",
+    "topic": "mechanism",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d1"
+     ],
+     "b": [
+      "d1"
+     ],
+     "c": [
+      "d1"
+     ]
+    },
+    "justification": "All three demote the BEL from trigger to claim: it parks/arms/defers and something else corroborates before any announcement."
+   },
+   {
+    "id": "c2",
+    "question": "Working-agent suppression and the idle hold (bug 1)",
+    "topic": "mechanism",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d2"
+     ],
+     "b": [
+      "d1",
+      "d2"
+     ],
+     "c": [
+      "d2",
+      "d4"
+     ]
+    },
+    "lc_members": {
+     "a": "d2",
+     "b": "d1"
+    },
+    "justification": "All three: judge against the offset-immune live-screen thinking probe; ring only after the same 300ms idle hold the scan's debounce uses; a and c both explicitly skip the 1200ms real-spell test on the bell path."
+   },
+   {
+    "id": "c3",
+    "question": "How long does a parked claim survive continued work?",
+    "topic": "threshold",
+    "verdict": "fork",
+    "members": {
+     "a": [
+      "d2"
+     ],
+     "b": [
+      "d2",
+      "d7"
+     ],
+     "c": [
+      "d4"
+     ]
+    },
+    "lc_members": {
+     "b": "d7",
+     "c": "d4"
+    },
+    "justification": "a: observed thinking voids the claim at the next adjudication tick (~120ms). b: expires at 10s. c: discards at 5s. Ratios far beyond 2x, and void-immediately vs grace-period is a different shape."
+   },
+   {
+    "id": "c4",
+    "question": "Restore-burst suppression signal (bug 2)",
+    "topic": "mechanism",
+    "verdict": "fork",
+    "members": {
+     "a": [
+      "d3"
+     ],
+     "b": [
+      "d2"
+     ],
+     "c": [
+      "d3"
+     ]
+    },
+    "lc_members": {
+     "a": "d3",
+     "c": "d3"
+    },
+    "justification": "Three different signals. a: input provenance - 'a BEL arms only when human_typed is set, which only send() sets'. b: observation history - 'parks only if the pane observed its agent working within the last 30s'. c: spawn age plus evidence - '10s BELL_SPAWN_GRACE... plus an evidence gate (cached thinking, or the working-to-idle flip within 5s)'."
+   },
+   {
+    "id": "c5",
+    "question": "A repeat BEL while a finish is latched?",
+    "topic": "policy",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d5"
+     ],
+     "b": [
+      "d4"
+     ],
+     "c": [
+      "d6"
+     ]
+    },
+    "lc_members": {
+     "a": "d5",
+     "b": "d4"
+    },
+    "justification": "All three: swallowed/ignored rather than re-ringing; pending state cleared so an acked finish cannot re-announce."
+   },
+   {
+    "id": "c6",
+    "question": "How is the scan path kept unchanged?",
+    "topic": "mechanism",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d4"
+     ],
+     "b": [
+      "d3"
+     ],
+     "c": [
+      "d5"
+     ]
+    },
+    "lc_members": {
+     "c": "d5"
+    },
+    "justification": "Different refactors (shared ring_finish; hoisted probe consuming the same-tick value; seeded not_thinking_since with the scan's ring inert), identical commitment: scan-path behaviour preserved exactly."
+   },
+   {
+    "id": "c7",
+    "question": "Where does the decision logic live and how is it tested?",
+    "topic": "verification",
+    "verdict": "same",
+    "members": {
+     "a": [
+      "d6"
+     ],
+     "b": [
+      "d5"
+     ],
+     "c": [
+      "d1",
+      "d7"
+     ]
+    },
+    "justification": "All three extract pure verdict functions beside wants_human/looks_blocked and table-test them; live-PTY scenarios declared untestable rather than faked."
+   }
+  ]
+ }
+}

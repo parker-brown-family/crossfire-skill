@@ -1,0 +1,89 @@
+{
+ "run_id": "t3-bell-c",
+ "ticket": "t3-bell",
+ "base_sha": "324215bcf30f07e9c7f6d6a7633b437d496bae8b",
+ "config": {
+  "model": "fable-5",
+  "effort": "session-default",
+  "framing": "none",
+  "axis": "same-config"
+ },
+ "decided": [
+  {
+   "id": "d1",
+   "surface": "app/src/pane.rs",
+   "claim": "Treat a BEL as a claim needing corroboration, not a finish: the handler routes it through a pure classify_bell(latched, pane_age, screen_working, cached_thinking, idle_for) -> Ring | Defer | Ignore, keeping the whole policy unit-testable without a PTY (same idiom as wants_human/looks_blocked)."
+  },
+  {
+   "id": "d2",
+   "surface": "app/src/pane.rs",
+   "claim": "'Demonstrably still working' = the offset-immune agent_is_thinking() live-screen read at bell time; when the working footer is on screen the bell is Deferred (bell_pending), never rung \u2014 false is the worst outcome, so ambiguity always defers."
+  },
+  {
+   "id": "d3",
+   "surface": "app/src/pane.rs",
+   "claim": "Restore burst is killed by two layers: a 10s BELL_SPAWN_GRACE (spawned field) ignoring all bells while the resumed CLI replays its transcript, plus an evidence gate \u2014 with the screen idle, a bell only rings if this pane recently watched the agent work (cached thinking still set, or the working-to-idle flip observed within 5s); otherwise Ignore. The evidence gate also stops stray beeps from long-idle agents, and a latched bell ignores repeat BELs instead of re-notifying."
+  },
+  {
+   "id": "d4",
+   "surface": "app/src/pane.rs",
+   "claim": "A deferred bell is resolved by the existing settled 120ms scan via pure resolve_pending_bell: ring once idle has held the same 300ms debounce the scan uses (skipping only the 1200ms real-spell test, since the BEL is the evidence that test approximates), keep holding while ambiguous, discard after 5s of demonstrable work (mid-turn beep - the eventual finish belongs to the scan path)."
+  },
+  {
+   "id": "d5",
+   "surface": "app/src/pane.rs",
+   "claim": "When pending is armed and the scan sees idle but no flip edge was ever recorded (footer came and went between settled ticks), seed not_thinking_since so the debounce can run; with think_since unset the scan's own ring stays inert, so scan-path behaviour is preserved (its inline 300ms literal swapped for the shared BELL_IDLE_DEBOUNCE constant, value unchanged)."
+  },
+  {
+   "id": "d6",
+   "surface": "app/src/pane.rs",
+   "claim": "Lifecycle hygiene: every ring site clears bell_pending plus the spell fields; ack_bell clears pending only past its existing early-return, so acknowledging an announced finish cannot be re-announced, while a mere glance at a still-working pane cannot lose a deferred one; pending is dropped if the pane leaves agent mode or the scan's ring wins the race."
+  },
+  {
+   "id": "d7",
+   "surface": "app/src/pane.rs",
+   "claim": "Six table-tests in pane.rs's existing test module cover both reported bugs and the preserved fast path: defer-while-working, ignore-replayed-restore-bells, ring-at-bell-speed on idle+evidence, ignore idle stray beeps and double BELs, ring-only-after-idle-holds, and mid-turn-beep expiry."
+  }
+ ],
+ "least_confident": [
+  {
+   "ref": "d3",
+   "why": "The 10s spawn grace and 5s recent-flip window are judgment constants, not measured: a very large transcript on a slow disk could conceivably replay past 10s (the evidence gate is the real backstop there), and 5s recent-flip is my guess at how late a genuine finish's BEL can trail the observed flip."
+  },
+  {
+   "ref": "d4",
+   "why": "Skipping the real-spell test on the deferred path is a deliberate loosening: a mid-turn beep followed within 5s by a 300ms+ working-footer flicker would ring falsely - though the scan's own path already rings on such a flicker mid-turn (real spell holds), so I believe this adds no new risk class."
+  },
+  {
+   "ref": "d5",
+   "why": "Seeding not_thinking_since from the pending path writes a field the scan's edge detector owns; I traced the interactions (edge on thinking-start resets it, think_since stays None so the scan ring stays inert) but this is the change most likely to have an interaction I missed."
+  }
+ ],
+ "not_done": [
+  {
+   "claim": "Nothing compiled or run: cargo build/test/fmt were out of scope, so the diff is verified only by careful reading - syntax, borrows, and the six new tests are unexecuted.",
+   "why": "Exercise rule; the strongest unverified spots are closure-scope variable use (recent, thinking) inside the effects-clock update closure."
+  },
+  {
+   "claim": "The two reported scenarios were not exercised end-to-end against a live PTY with a real agent (scrollback beep over a working Claude pane; a window restore replaying a bell-carrying transcript).",
+   "why": "They genuinely need a live PTY, a real agent CLI, session save/restore, and audio - not fakeable honestly in unit tests; the pure-function tests cover the decision policy, not the event plumbing."
+  },
+  {
+   "claim": "A turn invisible to both arms stays unannounced: a spell the 120ms scan never observed whose BEL arrives after the footer is gone is Ignored, and the scan declines it too (its 1200ms real-spell test).",
+   "why": "Aligns the bell arm with the product's existing doctrine that sub-1.2s spells are non-events; announcing on an uncorroborated BEL is exactly the false-positive class the ticket ranks worst."
+  },
+  {
+   "claim": "BELL_SOUNDS.md was not updated (it still documents the killed v1 per-pane sound-config system, and now also predates the corroboration policy).",
+   "why": "It was already stale before this ticket; rewriting a stale doc is beyond a proportionate change here."
+  },
+  {
+   "claim": "TD_GAMBA_DEMO mode now defers (and after 5s discards) every agent BEL, since it forces agent_is_thinking() true.",
+   "why": "Demo mode fakes a perpetually-working agent; suppressing finish announcements there is consistent, but I did not add a carve-out."
+  }
+ ],
+ "cost": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "wall_clock_s": 0
+ }
+}

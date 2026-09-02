@@ -1,0 +1,85 @@
+{
+ "run_id": "t3-bell-sonnet",
+ "ticket": "t3-bell",
+ "base_sha": "324215bcf30f07e9c7f6d6a7633b437d496bae8b",
+ "config": {
+  "model": "sonnet",
+  "effort": "harness-default",
+  "framing": "none",
+  "axis": "model"
+ },
+ "decided": [
+  {
+   "id": "d1",
+   "surface": "app/src/pane.rs",
+   "claim": "Added a pure gate `bell_is_genuine_finish(since_spawn, is_thinking)` plus a `BELL_STARTUP_GRACE` (2000ms) const, and made the `TermEvent::Bell` arm require it in addition to the existing `self.mode.is_agent()` check before latching a finish \u2014 this is the whole fix, both reported bugs traced to this one unconditional line."
+  },
+  {
+   "id": "d2",
+   "surface": "app/src/pane.rs",
+   "claim": "Reused two existing signals instead of adding new state: the `spawned: Instant` field (previously only backing a 150ms first-keystroke debounce) as the pane's spawn clock for the startup-replay guard, and `agent_is_thinking()` (the periodic scan's own live, scroll-position-independent screen check) as the 'still working' signal for the scrollback-false-positive guard."
+  },
+  {
+   "id": "d3",
+   "surface": "app/src/pane.rs",
+   "claim": "Set the startup grace window to 2000ms \u2014 long enough that a human-plus-CLI-startup sequence on a genuinely fresh pane can never race it, short enough not to matter against real turn durations (the scan path's own 'real spell' threshold is 1200ms)."
+  },
+  {
+   "id": "d4",
+   "surface": "app/src/pane.rs",
+   "claim": "Either guard failing drops the bell event outright (no latch, no deferred marker, no state mutation) rather than queuing it; the periodic screen-scan keeps polling independently and still rings on a genuine finish, so a dropped bell can only delay an announcement, never lose one, matching the ticket's stated trade-off."
+  },
+  {
+   "id": "d5",
+   "surface": "screen-scan heuristic",
+   "claim": "Left the periodic thinking/not-thinking scan and its three existing guards (real-spell >1200ms, not-thinking debounce 300ms, scroll-settle 200ms) completely untouched, per the ticket's explicit constraint that this path keep its current behaviour."
+  },
+  {
+   "id": "d6",
+   "surface": "CHANGELOG.md",
+   "claim": "No '### Fixed' entry added. The two most recent commits on this branch (tab-badge freeze fix, per-agent badge) sit in this exact feature area and neither touched CHANGELOG.md, so I matched that more recent precedent over older entries further up the file."
+  },
+  {
+   "id": "d7",
+   "surface": "app/src/pane.rs",
+   "claim": "Tests target `bell_is_genuine_finish` only, as a pure function over (Duration, bool) \u2014 three tests covering the startup-replay case, the scrollback/still-thinking case, and the past-grace-idle baseline. Did not attempt to test `handle_term_event`'s wiring or `agent_is_thinking`'s grid scan directly, since both need a live PTY + gpui `Context`, and this codebase's existing suite (confirmed via grep) never uses gpui's `TestAppContext` or a real PTY in a test \u2014 it always extracts logic into plain functions instead, which is what this change follows."
+  }
+ ],
+ "least_confident": [
+  {
+   "ref": "d3",
+   "why": "2000ms is a reasoned guess, not a measurement \u2014 I have no way to observe how long a real `claude --resume`/`codex resume` actually takes to reprint its history on this machine (no build, no live agent). If a large transcript's replay burst runs longer than the window, a late replayed bell could still slip through, though only if the replayed screen also fails to look like 'still thinking' at that instant."
+  },
+  {
+   "ref": "d2",
+   "why": "`agent_is_thinking()` was written to be read from the periodic tick, always well after the grid settles. I'm now also reading it synchronously inside `handle_term_event` at the instant a Bell event is dequeued from the async event channel \u2014 by then the shared grid may already reflect bytes written well after the BEL in the original stream (the channel is unbounded and events are handled after the fact), so the exact staleness of the read relative to the BEL's true position in the stream is not something I could verify without a live PTY."
+  },
+  {
+   "ref": "d1",
+   "why": "The multi-line match-guard syntax (`TermEvent::Bell if ... && ... => { ... }`) is standard Rust and I'm confident it's syntactically valid, but I could not run `cargo build` to confirm it actually compiles in this crate's exact type context."
+  }
+ ],
+ "not_done": [
+  {
+   "claim": "No `cargo build`/`test`/`clippy`/`fmt` run at any point.",
+   "why": "Explicitly out of scope for this exercise. Compilation, the exact formatting `rustfmt` would choose for the new match guard, and the actual pass/fail of the three new tests are all unverified beyond careful manual reading."
+  },
+  {
+   "claim": "No end-to-end verification against a real `claude --resume` / `codex resume` process, a live PTY, or an actual window-restore replaying a saved session.",
+   "why": "This is exactly the scenario report #2 describes, and I have no way to spin up a live agent CLI or drive a real PTY inside this sandbox. The fix's mechanism (a time-since-spawn grace window) is inferred from the ticket's description of the replay behaviour, not observed directly."
+  },
+  {
+   "claim": "No test exercises `TerminalView::handle_term_event`'s `TermEvent::Bell` arm itself, or `agent_is_thinking()`'s live grid scan.",
+   "why": "Both require a real `Session` (a spawned PTY + child shell) and a gpui `Context`; this codebase's test suite has no precedent for either (no `TestAppContext`/`#[gpui::test]` anywhere in app/src), so building one would be a new, disproportionate testing pattern for this ticket. Declared per the ticket's own instruction rather than faking a verification."
+  },
+  {
+   "claim": "Did not add burst/count-based replay detection (e.g. treating N bells within M ms as a burst) as an alternative or supplement to the time-since-spawn window.",
+   "why": "Considered and rejected as unneeded complexity \u2014 the spawn-time window already covers the described mechanism (a resumed CLI's history reprint happens right after its own process starts), and a single replayed bell from a short prior transcript wouldn't be a 'burst' anyway."
+  }
+ ],
+ "cost": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "wall_clock_s": 0
+ }
+}

@@ -1,0 +1,94 @@
+{
+ "run_id": "t2-adoption-b",
+ "ticket": "t2-adoption",
+ "base_sha": "93db4924d55c7971d5a2294e6c545b751ad0d42d",
+ "config": {
+  "model": "fable-5",
+  "effort": "session-default",
+  "framing": "none",
+  "axis": "same-config"
+ },
+ "decided": [
+  {
+   "id": "d1",
+   "surface": "app/src/main.rs",
+   "claim": "The substance signal is a top-level `panes` pane count (Option<usize>, skip-if-none) recorded in StateFile on every save from pane_count(); a count rather than a boolean or tab count, matching the existing count_saved_leaves richness metric and keeping threshold policy in the scanner."
+  },
+  {
+   "id": "d2",
+   "surface": "app/src/instance.rs",
+   "claim": "Ranking gains one tier between the untouched workspace hint and recency: an arranged session (panes > 1) still in play outranks a scratch-sized one; within a tier, recency then id decide as before."
+  },
+  {
+   "id": "d3",
+   "surface": "app/src/instance.rs",
+   "claim": "\"Still in play\" is measured save-to-save \u2014 within SUBSTANCE_WINDOW of the newest candidate's mtime, never of the launch clock \u2014 so a month away from the machine reorders nothing and the ordering is a stable fact about the saves."
+  },
+  {
+   "id": "d4",
+   "surface": "app/src/instance.rs",
+   "claim": "SUBSTANCE_WINDOW is 7 days: a weekend of one-command windows cannot orphan Friday's wall, while 'abandoned weeks ago' always falls outside."
+  },
+  {
+   "id": "d5",
+   "surface": "app/src/instance.rs",
+   "claim": "Compatibility: a file with no `panes` key ranks as arranged (is_none_or(n > 1)), so on the first launch after upgrading every pre-upgrade session orders exactly as today and is never demoted behind a fresh trivial one."
+  },
+  {
+   "id": "d6",
+   "surface": "app/src/instance.rs",
+   "claim": "The scan stays one read_to_string per file: a hand-rolled toml_top_level_integer pulls `panes` from the same body the workspace hint already reads, stopping at the first table header; no session file is deserialised."
+  },
+  {
+   "id": "d7",
+   "surface": "app/src/instance.rs",
+   "claim": "The scratch-window theme borrow (resolve_key/theme_key_in) shares the amended rank rather than keeping bare recency, so a tear-off inherits the wall's look and there is exactly one ordering."
+  },
+  {
+   "id": "d8",
+   "surface": "app/src/main.rs",
+   "claim": "The coupling between toml 0.8's serializer and the hand-rolled scanner is pinned by a test asserting `panes` and `last_workspace` land ahead of the first `[` table header in the serialized state."
+  }
+ ],
+ "least_confident": [
+  {
+   "ref": "d4",
+   "why": "The ticket only bounds the window between a same-day throwaway and 'weeks'; 7 days is a judgment call with no empirical basis, and a different constant inside that range is equally defensible."
+  },
+  {
+   "ref": "d3",
+   "why": "Relative-to-newest means an arranged session within the window of a months-old trivial newest still wins; I judged that correct (the throwaway story, frozen in time) but it is the semantics most open to argument versus clock-relative decay."
+  },
+  {
+   "ref": "d7",
+   "why": "Changing the theme-borrow ordering is a side effect of sharing rank; keeping bare recency there would have preserved existing tear-off behaviour at the cost of two orderings."
+  }
+ ],
+ "not_done": [
+  {
+   "claim": "Nothing was executed: no cargo build/test/clippy/fmt, so the new unit tests, the flock-based adoption tests, and compilation itself are verified only by careful reading.",
+   "why": "Builds and test runs are out of scope for this exercise by instruction."
+  },
+  {
+   "claim": "The toml 0.8 root-scalars-before-tables emission order is asserted by a new test but not observed running; the existing last_workspace feature already depends on it, which is the reading-level evidence.",
+   "why": "Confirming it requires running the test suite."
+  },
+  {
+   "claim": "No backfill of pane counts into existing session files on upgrade; absence simply ranks as arranged until the session's next real save writes the count.",
+   "why": "A migration would deserialise every session at boot \u2014 exactly what the ticket forbids \u2014 and the absent-means-arranged rule already gives the compatible ordering."
+  },
+  {
+   "claim": "No config knob for the window or the arranged threshold; both are doc-commented constants.",
+   "why": "Proportionality: the surrounding module handles equivalent tuning (WORKSPACE_TTL, IPC_TIMEOUT) as constants."
+  },
+  {
+   "claim": "End-to-end behaviour under a live compositor (workspace hint capture, real save cadence) is unverified.",
+   "why": "Needs the running app on Hyprland."
+  }
+ ],
+ "cost": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "wall_clock_s": 0
+ }
+}

@@ -1,0 +1,102 @@
+{
+ "run_id": "t3-bell-opus",
+ "ticket": "t3-bell",
+ "base_sha": "324215bcf30f07e9c7f6d6a7633b437d496bae8b",
+ "config": {
+  "model": "opus",
+  "effort": "harness-default",
+  "framing": "none",
+  "axis": "model"
+ },
+ "decided": [
+  {
+   "id": "d1",
+   "surface": "app/src/pane.rs",
+   "claim": "Treat a BEL byte as evidence rather than proof: the TermEvent::Bell arm now routes through a pure `bell_verdict(replaying, working, latched) -> Ring | Hold | Drop` instead of latching, playing, and emitting AgentDone on the byte alone."
+  },
+  {
+   "id": "d2",
+   "surface": "app/src/pane.rs",
+   "claim": "A bell that lands while the thinking scan says the agent is working is HELD in a new `bell_held` flag, not dropped \u2014 the ticket's ranking makes a false announcement worse than a delayed one and a lost one worse than a late one."
+  },
+  {
+   "id": "d3",
+   "surface": "app/src/pane.rs",
+   "claim": "The held bell is rung by the existing 120ms scan on its next stop edge, past the same 300ms not-thinking debounce but WITHOUT the scan's >1200ms real-spell test \u2014 that bar rejects spinner flicker, and a bell carries the agent's own word; the scan's own `real` path is bit-for-bit unchanged."
+  },
+  {
+   "id": "d4",
+   "surface": "app/src/pane.rs",
+   "claim": "Restore-replay suppression is a per-pane latch (`bell_replay`, seeded in `new_restored` from `restore.resume.is_some()`), not a startup grace timer \u2014 a timer would be defeated by a long transcript and would also mute a fresh pane that has nothing to replay."
+  },
+  {
+   "id": "d5",
+   "surface": "app/src/pane.rs",
+   "claim": "The replay latch is cleared only by a keystroke or a mouse-down, via a new `attend()` that wraps `ack_bell`; deliberately NOT by the focus-in edge, because restoring a window focuses a pane before the replay reaches it."
+  },
+  {
+   "id": "d6",
+   "surface": "app/src/pane.rs",
+   "claim": "A BEL arriving while a finish is already latched and unacknowledged now Drops instead of re-announcing, bringing the BEL arm in line with the scan arm's long-standing `!view.bell` guard."
+  },
+  {
+   "id": "d7",
+   "surface": "app/src/pane.rs",
+   "claim": "Both halves of the decision are extracted as pure functions (`bell_verdict`, `announce_on_stop`) and covered by two truth-table tests in the existing `mod tests`, following the repo's `should_invert` / `agent_badge` idiom rather than trying to drive a gpui entity."
+  },
+  {
+   "id": "d8",
+   "surface": "CHANGELOG.md",
+   "claim": "Recorded the behaviour change as an Unreleased `Fixed` entry in the repo's narrative style, and added a 'A bell is a hint, not a finish' section to BELL_SOUNDS.md, whose 'Rings on completion, too' section was the only written statement of the old contract."
+  }
+ ],
+ "least_confident": [
+  {
+   "ref": "d6",
+   "why": "The ticket did not ask for this. Two genuine back-to-back finishes with no acknowledgement in between now announce once instead of twice, which is arguably a lost announcement \u2014 I judged it a lost duplicate (the badge is already up and the notification already sent) and took consistency with the scan arm, but this is the entry most likely to be out of scope."
+  },
+  {
+   "ref": "d5",
+   "why": "Keystroke-or-click is the only arming event, so a restored agent pane that somehow resumes into live work on its own \u2014 or an adopted/attached pane that finishes a turn nobody typed into \u2014 stays silent indefinitely. I believe `claude --resume` and `codex resume` only replay and wait, but I could not run one to confirm, and if I am wrong this is a lost announcement of exactly the kind the ticket forbids."
+  },
+  {
+   "ref": "d2",
+   "why": "A held bell has no expiry: it rings only on an observed stop, so if the thinking scan ever sticks true (agent killed mid-turn with the spinner still on screen) the bell is never announced. I rejected a timeout because any deadline would fire falsely during a long scrollback session \u2014 the scan is frozen there and the cached 'working' stays true \u2014 but that leaves one residual lost case."
+  }
+ ],
+ "not_done": [
+  {
+   "claim": "Nothing was compiled, tested, or formatted.",
+   "why": "The exercise forbids running cargo. So the borrow-check of `bell_verdict(self.bell_replay, self.agent_working(), self.bell)` inside a `&mut self` method, the `replaying` binding still being live at the struct literal ~250 lines later in `new_restored`, and both new tests passing are all unverified by execution \u2014 only by reading."
+  },
+  {
+   "claim": "Neither reported scenario was reproduced or observed fixed.",
+   "why": "Scrollback ringing a finish needs a live PTY, a real agent mid-turn, and real Alt+arrow scrollback; the restore burst needs a saved session file whose panes carry resume commands and whose transcripts contain BELs. Both fixes are argued from the code, not watched."
+  },
+  {
+   "claim": "Did not confirm that a resumed claude/codex actually re-emits BEL bytes while replaying.",
+   "why": "The brief asserts it and I took that as given. If a CLI instead redraws its transcript without BEL, the replay latch is harmless but buys nothing, and problem 2 would have a different root."
+  },
+  {
+   "claim": "Did not measure how stale `agent_working()` is at BEL time.",
+   "why": "It is the 120ms scan's cached answer, so a genuine finish bell will often arrive while the cache still reads working and will be Held rather than Rung \u2014 costing roughly 300-500ms. That is accepted by the ticket's stance, but the actual distribution is unmeasured, and if it is the common case the BEL arm's speed advantage over the scan is smaller than assumed."
+  },
+  {
+   "claim": "No UI or diagnostic surface for a held or dropped bell.",
+   "why": "A held bell is invisible until it rings, and a dropped one leaves no trace \u2014 deliberately, to keep the change proportionate, but it makes a future 'why did my finish not announce' report harder to answer."
+  },
+  {
+   "claim": "The screen-scan path's own guards were left alone.",
+   "why": "The ticket says they keep their current behaviour. `announce_on_stop(real, false, latched)` is exactly the old `real && !view.bell`."
+  },
+  {
+   "claim": "No persistence of bell state across restarts, and no expiry deadline on a held bell.",
+   "why": "Neither was asked for; the held-bell deadline is argued against in least_confident."
+  }
+ ],
+ "cost": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "wall_clock_s": 0
+ }
+}

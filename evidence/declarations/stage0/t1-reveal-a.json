@@ -1,0 +1,89 @@
+{
+ "run_id": "t1-reveal-a",
+ "ticket": "t1-reveal",
+ "base_sha": "126bdbd5464bfdacf249ebda43ea6fe18e0a1c78",
+ "config": {
+  "model": "fable-5",
+  "effort": "session-default",
+  "framing": "none",
+  "axis": "same-config"
+ },
+ "decided": [
+  {
+   "id": "d1",
+   "surface": "app/src/pane.rs",
+   "claim": "Reveal goes through the cross-desktop D-Bus interface org.freedesktop.FileManager1.ShowItems (Nautilus, Dolphin, Nemo, Thunar all register it), invoked by shelling out to dbus-send, then gdbus, then busctl \u2014 no D-Bus crate added to a dependency-averse tree; if every knock fails, degrade to xdg-open on the containing directory (beside the item, unselected) rather than failing silently."
+  },
+  {
+   "id": "d2",
+   "surface": "app/src/pane.rs",
+   "claim": "The whole reveal errand \u2014 D-Bus round-trips with 5s reply timeouts plus the fallback \u2014 runs on a detached std::thread::spawn, mirroring open_with_system's detached-process idiom, so the UI thread never waits on activation or a file-manager cold start."
+  },
+  {
+   "id": "d3",
+   "surface": "app/src/pane.rs",
+   "claim": "One shared gate, reveal_target = local_path_of + exists(): bare absolute paths pass through, file:// URIs are unwrapped (empty or localhost authority only; any other host refused) with byte-level %XX decoding into an OsString so spaces and non-UTF-8 names survive; both the chord and the menu row funnel through it, so a web URL can never offer or attempt reveal."
+  },
+  {
+   "id": "d4",
+   "surface": "app/src/pane.rs",
+   "claim": "The Super+Ctrl chord (modifiers.platform && modifiers.control) is tested before the existing Shift/Ctrl open chord; on a link with no local target (a web URL, a vanished file) it deliberately falls through and behaves as the plain Ctrl-click it contains \u2014 the brief's 'keeps the existing open behaviour'."
+  },
+  {
+   "id": "d5",
+   "surface": "app/src/pane.rs",
+   "claim": "The URI handed to D-Bus is built by our own percent-encoder escaping every byte outside unreserved + '/', stricter than RFC 3986 on purpose: an unescaped comma splits dbus-send's array:string: list and an unescaped quote ends gdbus's GVariant literal."
+  },
+  {
+   "id": "d6",
+   "surface": "app/src/lang.rs",
+   "claim": "The help HUD's LINKS section documents the new chord, so k_super_ctrl_click/reveal_link strings were added to the Strings struct and all nine language tables (my own translations); the context-menu label 'Reveal in file manager' stays hardcoded English like its siblings (Open link, Copy, Paste)."
+  },
+  {
+   "id": "d7",
+   "surface": "app/src/pane.rs",
+   "claim": "Sloppy-URI tolerance: malformed %-escapes decode literally instead of rejecting the link, and query/fragment are NOT stripped from file:// URIs \u2014 a printed '#' or '?' is likelier a literal character of a filename in terminal output than a real fragment, and the exists() gate quietly declines the offer when it isn't."
+  }
+ ],
+ "least_confident": [
+  {
+   "ref": "d1",
+   "why": "The chain's success detection rests on the three D-Bus CLIs' exact flags and exit codes (dbus-send --print-reply/--reply-timeout, gdbus --timeout and GVariant arg forms, busctl 'ass 1' marshalling), none of which I could execute; one wrong flag silently shifts work to the next client or straight to the parent-dir fallback."
+  },
+  {
+   "ref": "d4",
+   "why": "That gpui's modifiers.platform is Super on Linux is read from sibling code, not observed; and tiling compositors (Hyprland especially) commonly grab Super+click chords before the app ever sees them \u2014 unverifiable without a session."
+  },
+  {
+   "ref": "d7",
+   "why": "Not stripping fragments/queries trades a rare correct-URI case (a genuine #fragment on a file URI reveals nothing) for the common sloppy-terminal case; the opposite call would corrupt legitimate names containing '#'."
+  }
+ ],
+ "not_done": [
+  {
+   "claim": "No build, clippy, or test run \u2014 every change is read-verified only.",
+   "why": "Builds are out of scope for this exercise; compile-level slips (closure lifetime inference in the knock helper, arg-array coercions) are therefore unverified."
+  },
+  {
+   "claim": "No integration or UI test for the chord, the menu row, or an actual reveal; only the pure logic (local_path_of, file_uri round-trip, reveal_target gating) is unit-tested.",
+   "why": "Exercising them needs a running compositor, a session D-Bus, and an installed file manager."
+  },
+  {
+   "claim": "Bare absolute paths containing spaces are still not recognized as links.",
+   "why": "Pre-existing whitespace tokenization in link_at; awkward names reach reveal via the file:// URI shape, which is what agents' links tables print. Widening the recognizer is a different ticket."
+  },
+  {
+   "claim": "No per-file-manager fallback (nautilus --select and friends) beyond FileManager1.",
+   "why": "The brief says not to assume a specific file manager; parent-directory xdg-open is the stated nearest-useful degrade."
+  },
+  {
+   "claim": "The 5-second D-Bus reply timeout against a cold-starting file manager is untuned; a very slow start could reveal late AND open the parent directory.",
+   "why": "Tuning it needs a real desktop to measure."
+  }
+ ],
+ "cost": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "wall_clock_s": 0
+ }
+}

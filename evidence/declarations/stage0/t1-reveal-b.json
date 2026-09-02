@@ -1,0 +1,90 @@
+{
+ "run_id": "t1-reveal-b",
+ "ticket": "t1-reveal",
+ "base_sha": "126bdbd5464bfdacf249ebda43ea6fe18e0a1c78",
+ "config": {
+  "model": "fable-5",
+  "effort": "session-default",
+  "framing": "none",
+  "axis": "same-config"
+ },
+ "decided": [
+  {
+   "id": "d1",
+   "surface": "app/src/pane.rs",
+   "claim": "Built on the existing link machinery: a pure `reveal_target` classifier consumes exactly what `link_under` returns (resolved absolute path or printed URL), with hand-rolled `percent_decode`/`percent_encode_path` helpers instead of adding a url/percent-encoding dependency."
+  },
+  {
+   "id": "d2",
+   "surface": "app/src/pane.rs",
+   "claim": "Reveal goes through the freedesktop org.freedesktop.FileManager1.ShowItems D-Bus method (Nautilus/Dolphin/Nemo/Thunar/PCManFM-Qt all implement it), reached via the first working CLI of dbus-send, gdbus, busctl \u2014 no D-Bus library dependency and no single file manager assumed."
+  },
+  {
+   "id": "d3",
+   "surface": "app/src/pane.rs",
+   "claim": "The whole try-chain runs on a detached std::thread (children are waited there, never on the UI thread); when no ShowItems implementation answers, it degrades to opening the containing directory via the existing `open_with_system`, with one stderr line noting the degradation."
+  },
+  {
+   "id": "d4",
+   "surface": "app/src/pane.rs",
+   "claim": "The Super+Ctrl chord (`modifiers.platform && modifiers.control`) is tested BEFORE the existing Shift/Ctrl open chord, because Super+Ctrl contains Ctrl; a non-revealable target (web URL, nonexistent path) falls through to the ordinary open, so web URLs keep today's behaviour on the same chord."
+  },
+  {
+   "id": "d5",
+   "surface": "app/src/pane.rs",
+   "claim": "file:// URIs qualify only with an empty or `localhost` authority (any other host is not this disk); invalid %-escapes are kept literal (printed URIs are often sloppy), non-UTF-8 decodes are refused, and both the chord and the menu entry are gated on the decoded path existing on disk."
+  },
+  {
+   "id": "d6",
+   "surface": "app/src/pane.rs",
+   "claim": "The context-menu row is hardcoded English (\"Reveal in file manager\"), matching its unlocalized siblings (Copy/Paste/Clear scrollback) rather than plumbing lang.rs into the pane menu."
+  },
+  {
+   "id": "d7",
+   "surface": "app/src/lang.rs",
+   "claim": "Discoverability: the help modal's LINKS section gains a Super+Ctrl-click row and the rclick legend string now lists Reveal \u2014 two new fields plus an amended one across all nine language tables, translations written by me."
+  },
+  {
+   "id": "d8",
+   "surface": "CHANGELOG.md",
+   "claim": "Added an Unreleased/Added entry, since the repo actively maintains a Keep-a-Changelog file."
+  }
+ ],
+ "least_confident": [
+  {
+   "ref": "d2",
+   "why": "The exact CLI argument shapes (dbus-send `array:string:`/`string:`, gdbus GVariant text, busctl `ass 1`) are from knowledge and could not be executed here; a syntax slip would silently drop to the open-parent fallback rather than fail loudly."
+  },
+  {
+   "ref": "d7",
+   "why": "Eight of the nine translations are my own wording with no native-speaker review; the compact rclick legend strings especially trade nuance for width."
+  },
+  {
+   "ref": "d4",
+   "why": "On Hyprland/Sway the compositor binds many Super-modified inputs; whether Super+Ctrl-click reaches the client at all depends on the user's WM config and is unverifiable without a session."
+  }
+ ],
+ "not_done": [
+  {
+   "claim": "Nothing was compiled, tested, or formatted \u2014 cargo build/test/fmt were out of scope, so type-checks, borrow-checks, and the three new unit tests are unverified by execution.",
+   "why": "Exercise rule forbids running build/test tooling; verified by careful reading only."
+  },
+  {
+   "claim": "The live reveal path is untested end-to-end: the D-Bus calls, per-file-manager ShowItems behaviour, D-Bus activation timing, and the open-parent fallback all need a running desktop session.",
+   "why": "No compositor or session bus available in this exercise."
+  },
+  {
+   "claim": "No query/fragment handling in file:// URIs (e.g. `file:///a/b#L10`): such URIs keep the characters literally, fail the existence gate, and simply don't offer reveal.",
+   "why": "Splitting on #/? would break literal #/? filenames from sloppy printers; both readings fail soft, so I kept the simpler one."
+  },
+  {
+   "claim": "Non-UTF-8 filenames cannot reveal (the link pipeline is String-shaped end to end), and the chord is not remappable via any config surface.",
+   "why": "Matches the existing machinery: link_under is String-based and the Shift/Ctrl open chord is likewise hardcoded."
+  }
+ ],
+ "cost": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "wall_clock_s": 0
+ }
+}

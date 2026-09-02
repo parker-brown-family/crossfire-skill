@@ -1,0 +1,89 @@
+{
+ "run_id": "t3-bell-b",
+ "ticket": "t3-bell",
+ "base_sha": "324215bcf30f07e9c7f6d6a7633b437d496bae8b",
+ "config": {
+  "model": "fable-5",
+  "effort": "session-default",
+  "framing": "none",
+  "axis": "same-config"
+ },
+ "decided": [
+  {
+   "id": "d1",
+   "surface": "app/src/pane.rs",
+   "claim": "A BEL on an agent pane never rings instantly anymore: it parks as a deferred finish-claim that the effects clock announces only after the live screen has held spinner-free for 300ms (the same hold the scan path's not-thinking debounce uses), so every genuine bell announcement is delayed a few ticks by design \u2014 the stated trade of delayed-beats-false, and the uniform hold is what stops a beep landing in a redraw flicker from ringing."
+  },
+  {
+   "id": "d2",
+   "surface": "app/src/pane.rs",
+   "claim": "Both reported bugs are judged against one new observation clock, last_seen_thinking (when the scroll-proof live-screen probe last SAW the working spinner): a claim parks only if the pane observed its agent working within the last 30s \u2014 a restored pane replaying its transcript has observed none, so the replay burst is discarded on arrival \u2014 and a parked claim that still sees the spinner when it expires at 10s is dropped, which is the scrollback-beep case; the real finish is then a long spell the scan path announces itself."
+  },
+  {
+   "id": "d3",
+   "surface": "app/src/pane.rs",
+   "claim": "Hoisted the agent_is_thinking probe out of the scroll-settle gate in the 120ms tick so the observation clock stays honest mid-scroll (the probe reads the live buffer bottom, so it was already scroll-proof); the settled scan block consumes the identical same-tick probe value, keeping the scan path and all its guards behaviourally unchanged."
+  },
+  {
+   "id": "d4",
+   "surface": "app/src/pane.rs",
+   "claim": "A BEL arriving while the finish badge is already latched is ignored (the old arm re-played the sound and re-emitted AgentDone), and the resolver drops any pending claim once the scan latches, so a stale claim can never re-ring after the user acks."
+  },
+  {
+   "id": "d5",
+   "surface": "app/src/pane.rs",
+   "claim": "The decision logic is extracted as pure functions \u2014 bell_claim_plausible and deferred_bell_outcome with the DeferredBell verdict enum \u2014 unit-tested in the existing pane tests module, matching the repo's idiom of pure, testable helpers (wants_human, looks_blocked) around untestable gpui entity wiring."
+  },
+  {
+   "id": "d6",
+   "surface": "app/src/term.rs",
+   "claim": "Added a correctness-matrix test pinning that a raw 0x07 byte emits exactly one Event::Bell without disturbing surrounding text, because the whole claim path (and the transcript-replay failure mode) hangs off that emission surviving crate bumps."
+  },
+  {
+   "id": "d7",
+   "surface": "app/src/pane.rs",
+   "claim": "Thresholds: 30s recent-work window (separates just-finished from replayed/idle), 300ms quiet hold (deliberately equal to the scan's existing debounce), 10s claim expiry (past which a bell demonstrably was not a finish); all module constants next to the pure functions."
+  }
+ ],
+ "least_confident": [
+  {
+   "ref": "d7",
+   "why": "The 30s window and 10s expiry are judgment values, not measurements: an agent CLI that rings its bell while its done-screen still matches the spinner phrase (\"interrupt)\") would have its bell expire and fall back to the scan, and I could not observe real CLIs' bell-vs-redraw ordering without running one."
+  },
+  {
+   "ref": "d1",
+   "why": "Deferring EVERY bell (rather than ringing instantly when the screen already reads not-thinking) adds ~300-450ms to all genuine bell announcements; the brief blesses delay over falseness, but if instant bells mattered more than I read, this is the decision to relax."
+  },
+  {
+   "ref": "d4",
+   "why": "Suppressing repeat BELs while the badge is latched removes a re-alert behaviour that may have been intentional for back-to-back finishes, though it looked accidental (the old arm simply re-ran unconditionally)."
+  }
+ ],
+ "not_done": [
+  {
+   "claim": "No build, test, clippy, or rustfmt run \u2014 compile-correctness (borrowck, let-else, match ergonomics in the term.rs filter closure, formatting) is verified by reading only.",
+   "why": "Builds are out of scope for this exercise per the run rules."
+  },
+  {
+   "claim": "The TerminalView wiring (BEL arm -> parked claim -> effects-clock resolution -> sound/badge/AgentDone) is untested in isolation; only the pure decision pair and the emulator's Bell emission have tests. The two reported scenarios end-to-end (a real Claude Code beep during scrollback, a real window restore replaying a transcript) need a live PTY and a real agent to exercise.",
+   "why": "TerminalView requires a gpui Context, a spawned PTY session, and real time; faking that harness would be a fake verification."
+  },
+  {
+   "claim": "The screen-scan path and its guards are untouched, including the scroll-settle gate whose comment claims a protection that agent_is_thinking's own comment says is unnecessary (the probe is viewport-independent) \u2014 noticed, not changed.",
+   "why": "The brief pins the scan path's current behaviour; reconciling the stale comment is cleanup with behavioural risk and belongs to a separate change."
+  },
+  {
+   "claim": "A replayed or live transcript that literally QUOTES the phrase \"esc to interrupt\" in its bottom rows can still fool the spinner heuristic (and therefore park, and possibly later ring, a claim).",
+   "why": "Inherent to the existing phrase-based agent_is_thinking heuristic that the scan path also relies on; fixing it is out of this ticket's proportion."
+  },
+  {
+   "claim": "TD_GAMBA_DEMO panes (probe forced to always-thinking) now never ring from a BEL \u2014 claims park and expire.",
+   "why": "Demo windows show a frozen fake screen with no real agent; an alert there was noise, but it is a behaviour change I did not separately gate."
+  }
+ ],
+ "cost": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "wall_clock_s": 0
+ }
+}

@@ -1,0 +1,94 @@
+{
+ "run_id": "t1-reveal-c",
+ "ticket": "t1-reveal",
+ "base_sha": "126bdbd5464bfdacf249ebda43ea6fe18e0a1c78",
+ "config": {
+  "model": "fable-5",
+  "effort": "session-default",
+  "framing": "none",
+  "axis": "same-config"
+ },
+ "decided": [
+  {
+   "id": "d1",
+   "surface": "app/src/pane.rs",
+   "claim": "Reveal rides the cross-desktop D-Bus org.freedesktop.FileManager1.ShowItems interface (Nautilus, Dolphin, Nemo, Caja, Thunar, PCManFM-Qt; D-Bus-activatable), called through whichever CLI is installed \u2014 gdbus, then dbus-send with the load-bearing --print-reply \u2014 instead of adding a dbus crate to a dependency-averse tree; if neither call succeeds, degrade to xdg-open on the containing directory."
+  },
+  {
+   "id": "d2",
+   "surface": "app/src/pane.rs",
+   "claim": "path_to_file_uri percent-encodes everything outside unreserved + '/' so the URI's whole alphabet is inert in both CLIs' grammars (no comma for dbus-send's array to split on, nothing for gdbus's GVariant text to escape) \u2014 awkward filenames survive by construction, pinned by an encode/decode round-trip test."
+  },
+  {
+   "id": "d3",
+   "surface": "app/src/pane.rs",
+   "claim": "file:// URIs decode via a hand-rolled strict-UTF-8 percent-decoder (malformed escapes kept literal, non-UTF-8 rejected): only an empty or localhost authority counts as this machine, ?query/#fragment are stripped, and the result is lexically normalised \u2014 no url crate."
+  },
+  {
+   "id": "d4",
+   "surface": "app/src/pane.rs",
+   "claim": "link_under was split into a shared link_token_under plus a parallel reveal_path_under gate that returns Some only for an existing local item \u2014 a bare path resolved against the pane's cwd, or a decoded file:// URI \u2014 so web URLs, remote-host URIs, and dead paths never offer or attempt reveal."
+  },
+  {
+   "id": "d5",
+   "surface": "app/src/pane.rs",
+   "claim": "The chord is modifiers.platform (Super) + control on left mouse-down, checked before the existing Shift/Ctrl open branch and falling through when nothing is revealable \u2014 so Shift-/Ctrl-click behaviour is untouched and Super+Ctrl on a web URL still opens it via the old branch."
+  },
+  {
+   "id": "d6",
+   "surface": "app/src/pane.rs",
+   "claim": "reveal_with_system runs on a throwaway std::thread rather than open_with_system's detached setsid spawn, because choosing the fallback requires the D-Bus CLI's exit status (a wait of up to the bus timeout); the UI thread only spawns the thread, and the final fallback reuses the detached open_with_system."
+  },
+  {
+   "id": "d7",
+   "surface": "app/src/pane.rs",
+   "claim": "The right-click menu row is hardcoded English ('Reveal in file manager  \u2316'), matching its untranslated neighbours ('Open link  \u2197', 'Copy', 'Paste'), gated on reveal_path_under and shown alongside Open link when both apply."
+  },
+  {
+   "id": "d8",
+   "surface": "discoverability",
+   "claim": "The help modal's LINKS section documents the chord \u2014 k_super_ctrl_click/reveal_link added to the Strings struct and all nine language consts (my own translations) with the row wired in main.rs \u2014 and a CHANGELOG Unreleased/Added entry records the feature per the repo's keep-a-changelog convention."
+  }
+ ],
+ "least_confident": [
+  {
+   "ref": "d1",
+   "why": "The gdbus/dbus-send invocations follow the canonical recipes (including gdbus's empty-string startup-id argument and both CLIs' nonzero exit on an unowned bus name), but I could not execute either; a parse quirk in gdbus's empty-arg handling would silently shift every reveal onto the dbus-send leg or the fallback."
+  },
+  {
+   "ref": "d5",
+   "why": "Whether Super+Ctrl+click reaches the app at all depends on the compositor not grabbing Super chords (Hyprland's SUPER-drag binds match the exact modifier set so it should pass, but this is reasoning, not observation)."
+  },
+  {
+   "ref": "d8",
+   "why": "Eight of the nine help-modal translations are my own unreviewed wording; phrasing conventions for 'file manager' vary per locale."
+  }
+ ],
+ "not_done": [
+  {
+   "claim": "No build, test, or formatter run \u2014 cargo is out of scope for this exercise.",
+   "why": "Everything is verified by reading only: compilation of all four files, the two new unit tests passing, and rustfmt conformance of the added blocks are unverified."
+  },
+  {
+   "claim": "reveal_path_under, the click routing, the menu row, and reveal_with_system's process behaviour are untested.",
+   "why": "They need a live grid, a compositor, and a session bus; per the brief only the introduced pure logic (URI decode/encode, round-trip, inert alphabet) got tests."
+  },
+  {
+   "claim": "No busctl third attempt in the CLI chain.",
+   "why": "gdbus (GLib) and dbus-send (dbus core) already cover any desktop that could own FileManager1; a box with neither still degrades to xdg-open of the parent directory rather than failing silently."
+  },
+  {
+   "claim": "ShowItems is passed an empty startup-notification id.",
+   "why": "A real activation token would need platform plumbing; the cost is possible focus-stealing prevention leaving the file manager window unfocused on some desktops."
+  },
+  {
+   "claim": "Non-UTF-8 filesystem paths cannot be revealed from file:// URIs.",
+   "why": "The decoder deliberately rejects them because the surrounding link plumbing is String-typed; a byte-preserving OsString path would be a larger refactor than the ticket warrants."
+  }
+ ],
+ "cost": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "wall_clock_s": 0
+ }
+}

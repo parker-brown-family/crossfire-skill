@@ -1,0 +1,94 @@
+{
+ "run_id": "t2-adoption-c",
+ "ticket": "t2-adoption",
+ "base_sha": "93db4924d55c7971d5a2294e6c545b751ad0d42d",
+ "config": {
+  "model": "fable-5",
+  "effort": "session-default",
+  "framing": "none",
+  "axis": "same-config"
+ },
+ "decided": [
+  {
+   "id": "d1",
+   "surface": "app/src/main.rs",
+   "claim": "Record a new top-level `panes = <n>` scalar in StateFile on every save, sourced from the existing pane_count(); Option<usize> with serde default + skip_serializing_if so old files load and old builds ignore it."
+  },
+  {
+   "id": "d2",
+   "surface": "app/src/instance.rs",
+   "claim": "Demote via an effective save time rather than a hard tier: a known-trivial session competes as if saved TRIVIAL_HANDICAP (7 days) earlier, so the gap is measured between the two saves, never against now \u2014 a vacation ages both equally, order stays total, and trivial sessions keep newest-first among themselves."
+  },
+  {
+   "id": "d3",
+   "surface": "app/src/instance.rs",
+   "claim": "Trivial means panes <= 1 (TRIVIAL_MAX_PANES): one split is already a deliberate arrangement, and the demotion stays narrow because demoting wrongly is the ticket's headline bug in reverse."
+  },
+  {
+   "id": "d4",
+   "surface": "app/src/instance.rs",
+   "claim": "Compatibility by polarity: only sessions KNOWN trivial are handicapped; a file with no panes key (pre-upgrade, incl. legacy state.toml adoption) gets Candidate.panes = None and ranks exactly as today, so upgrading demotes nobody."
+  },
+  {
+   "id": "d5",
+   "surface": "app/src/instance.rs",
+   "claim": "Read the count with toml_top_level_integer, a sibling of the existing hand-rolled toml_top_level_string, off the single read_to_string the scan already performs \u2014 no TOML deserialisation added to the boot path."
+  },
+  {
+   "id": "d6",
+   "surface": "app/src/instance.rs",
+   "claim": "The workspace hint stays the untouched primary sort key; the handicap only replaces the recency term below it, so a session you were standing on wins however small it is, and in the ticket's same-workspace story the hint ties and the handicap decides."
+  },
+  {
+   "id": "d7",
+   "surface": "app/src/instance.rs",
+   "claim": "theme_key_in (the scratch tear-off look) keeps sharing rank(), so a scratch window now borrows the arranged session's look over a newer throwaway's \u2014 one ranking doctrine rather than two."
+  },
+  {
+   "id": "d8",
+   "surface": "app/src/instance.rs",
+   "claim": "Tests: pure rank() cases for the story, the opposite-failure guard, the hint's supremacy, the pre-upgrade guarantee, the 2-pane boundary, trivial-vs-trivial recency, plus the parser unit test and an end-to-end file-based adoption of the story on a tied workspace hint."
+  }
+ ],
+ "least_confident": [
+  {
+   "ref": "d2",
+   "why": "The 7-day handicap is a judgment call between the same-day throwaway (minutes-hours) and the forbidden weeks-long stickiness; 48h was the plausible alternative and I erred long because wrongly burying the wall is the headline harm, but a wall idle 6 days still beating a day-old single pane may annoy someone."
+  },
+  {
+   "ref": "d3",
+   "why": "A 2-pane quickie still bulldozes the wall under this threshold; the brief's story is literally one pane so I kept the line narrow, but 'trivial' could defensibly include 2 panes or 1 tab."
+  },
+  {
+   "ref": "d7",
+   "why": "A scratch torn off from the throwaway itself now borrows the wall's look instead of its actual parent's when their workspaces differ; the hint rescues the common case, but I chose doctrine-sharing over special-casing without being able to observe it."
+  }
+ ],
+ "not_done": [
+  {
+   "claim": "No cargo build/test run \u2014 compilation of both files and all nine new/updated tests are unverified by execution.",
+   "why": "Builds are out of scope for this exercise; verification was by careful reading only."
+  },
+  {
+   "claim": "toml 0.8 emitting `panes` in the top-level scalar section (before the first [table] header) is unverified at runtime.",
+   "why": "Argued by analogy: last_workspace is the struct's last field yet provably lands top-level (the existing hand-parser and its fixtures depend on it), and toml 0.8 orders values before tables; a running app would confirm."
+  },
+  {
+   "claim": "No absolute-age decay: adoption never compares against now, so a wall idle 6 days still beats yesterday's throwaway.",
+   "why": "Deliberate \u2014 the brief bounds stickiness at 'weeks', and save-to-save comparison is vacation-safe where a now-relative horizon is not."
+  },
+  {
+   "claim": "No richer weight than pane count (tabs, agents, named panes not consulted).",
+   "why": "Pane count is the one cheap honest signal the story needs; anything more would widen the file format for speculative benefit."
+  },
+  {
+   "claim": "main.rs (15k lines) reviewed only around the edited regions; untouched StateFile consumers are assumed unaffected.",
+   "why": "All construction sites were enumerated by grep (4 literals + Default + build_state, others use ..Default::default()), but only those regions were read."
+  }
+ ],
+ "cost": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "wall_clock_s": 0
+ }
+}

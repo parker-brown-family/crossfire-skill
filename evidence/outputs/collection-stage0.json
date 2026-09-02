@@ -1,0 +1,182 @@
+{
+ "tickets": {
+  "t1-reveal": {
+   "valid_arms": [
+    "a",
+    "b",
+    "c"
+   ],
+   "files_touched": {
+    "a": [
+     "app/src/lang.rs",
+     "app/src/main.rs",
+     "app/src/pane.rs"
+    ],
+    "b": [
+     "CHANGELOG.md",
+     "app/src/lang.rs",
+     "app/src/main.rs",
+     "app/src/pane.rs"
+    ],
+    "c": [
+     "CHANGELOG.md",
+     "app/src/lang.rs",
+     "app/src/main.rs",
+     "app/src/pane.rs"
+    ]
+   },
+   "files_jaccard_pairs": [
+    {
+     "pair": "a-b",
+     "jaccard": 0.25,
+     "only_a": [],
+     "only_b": [
+      "CHANGELOG.md"
+     ],
+     "shared": [
+      "app/src/lang.rs",
+      "app/src/main.rs",
+      "app/src/pane.rs"
+     ]
+    },
+    {
+     "pair": "a-c",
+     "jaccard": 0.25,
+     "only_a": [],
+     "only_c": [
+      "CHANGELOG.md"
+     ],
+     "shared": [
+      "app/src/lang.rs",
+      "app/src/main.rs",
+      "app/src/pane.rs"
+     ]
+    },
+    {
+     "pair": "b-c",
+     "jaccard": 0.0,
+     "only_b": [],
+     "only_c": [],
+     "shared": [
+      "CHANGELOG.md",
+      "app/src/lang.rs",
+      "app/src/main.rs",
+      "app/src/pane.rs"
+     ]
+    }
+   ],
+   "files_jaccard_mean": 0.167,
+   "scoreable": true
+  },
+  "t2-adoption": {
+   "valid_arms": [
+    "a",
+    "b",
+    "c"
+   ],
+   "files_touched": {
+    "a": [
+     "app/src/instance.rs",
+     "app/src/main.rs"
+    ],
+    "b": [
+     "app/src/instance.rs",
+     "app/src/main.rs"
+    ],
+    "c": [
+     "app/src/instance.rs",
+     "app/src/main.rs"
+    ]
+   },
+   "files_jaccard_pairs": [
+    {
+     "pair": "a-b",
+     "jaccard": 0.0,
+     "only_a": [],
+     "only_b": [],
+     "shared": [
+      "app/src/instance.rs",
+      "app/src/main.rs"
+     ]
+    },
+    {
+     "pair": "a-c",
+     "jaccard": 0.0,
+     "only_a": [],
+     "only_c": [],
+     "shared": [
+      "app/src/instance.rs",
+      "app/src/main.rs"
+     ]
+    },
+    {
+     "pair": "b-c",
+     "jaccard": 0.0,
+     "only_b": [],
+     "only_c": [],
+     "shared": [
+      "app/src/instance.rs",
+      "app/src/main.rs"
+     ]
+    }
+   ],
+   "files_jaccard_mean": 0.0,
+   "scoreable": true
+  },
+  "t3-bell": {
+   "valid_arms": [
+    "a",
+    "b",
+    "c"
+   ],
+   "files_touched": {
+    "a": [
+     "app/src/pane.rs"
+    ],
+    "b": [
+     "app/src/pane.rs",
+     "app/src/term.rs"
+    ],
+    "c": [
+     "app/src/pane.rs"
+    ]
+   },
+   "files_jaccard_pairs": [
+    {
+     "pair": "a-b",
+     "jaccard": 0.5,
+     "only_a": [],
+     "only_b": [
+      "app/src/term.rs"
+     ],
+     "shared": [
+      "app/src/pane.rs"
+     ]
+    },
+    {
+     "pair": "a-c",
+     "jaccard": 0.0,
+     "only_a": [],
+     "only_c": [],
+     "shared": [
+      "app/src/pane.rs"
+     ]
+    },
+    {
+     "pair": "b-c",
+     "jaccard": 0.5,
+     "only_b": [
+      "app/src/term.rs"
+     ],
+     "only_c": [],
+     "shared": [
+      "app/src/pane.rs"
+     ]
+    }
+   ],
+   "files_jaccard_mean": 0.333,
+   "scoreable": true
+  }
+ },
+ "deviations": []
+}

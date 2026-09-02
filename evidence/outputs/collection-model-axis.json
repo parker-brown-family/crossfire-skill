@@ -1,0 +1,56 @@
+{
+ "arms": {
+  "t1-reveal-opus": {
+   "valid": true,
+   "decided": 8,
+   "files_touched": [
+    "CHANGELOG.md",
+    "app/src/lang.rs",
+    "app/src/main.rs",
+    "app/src/pane.rs",
+    "info.html"
+   ]
+  },
+  "t1-reveal-sonnet": {
+   "valid": true,
+   "decided": 8,
+   "files_touched": [
+    "app/src/pane.rs"
+   ]
+  },
+  "t2-adoption-opus": {
+   "valid": true,
+   "decided": 9,
+   "files_touched": [
+    "CHANGELOG.md",
+    "app/src/instance.rs",
+    "app/src/main.rs"
+   ]
+  },
+  "t2-adoption-sonnet": {
+   "valid": true,
+   "decided": 8,
+   "files_touched": [
+    "app/src/instance.rs",
+    "app/src/main.rs"
+   ]
+  },
+  "t3-bell-opus": {
+   "valid": true,
+   "decided": 8,
+   "files_touched": [
+    "BELL_SOUNDS.md",
+    "CHANGELOG.md",
+    "app/src/pane.rs"
+   ]
+  },
+  "t3-bell-sonnet": {
+   "valid": true,
+   "decided": 7,
+   "files_touched": [
+    "app/src/pane.rs"
+   ]
+  }
+ },
+ "deviations": []
+}

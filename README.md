@@ -80,6 +80,7 @@ rules-before-results discipline.
 | `skill/reference/rubric.md` | Topic taxonomy, cluster rule, verdict grammar |
 | `skill/reference/declaration.example.json` | The schema arms fill |
 | `skill/tools/` | `divergence.py` (scoring), `make-workspaces.sh` (contamination control) |
+| `evidence/` | **The audit layer, in full**: briefs verbatim, all 15 declarations, both adjudications with quoted verdicts, costs, deviation logs, and the method with its pre-registration hash chain |
 | `docs/index.html` | The research report, web edition |
 | `docs/BFS-TR-2026-02.pdf` | The technical report (paper edition) |
 | `docs/roadmap.html` | Living public progress tracker |
