@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crossfire — public research roadmap</title>
+<style>
+  :root{--ink:#1a1917;--muted:#6b6659;--line:#d8d2c4;--paper:#faf8f3;--box:#f4f0e6;
+        --accent:#8a2f1d;--good:#2c6e49}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 Georgia,serif}
+  .wrap{max-width:780px;margin:0 auto;padding:0 22px 90px}
+  header{padding:50px 0 6px;text-align:center}
+  .kicker{font:600 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.24em;
+          text-transform:uppercase;color:var(--muted)}
+  h1{font-size:30px;margin:16px 0 8px}
+  .sub{font-style:italic;color:#3d3a33;margin:0 0 8px}
+  nav a{font:12.5px ui-monospace,Menlo,monospace;text-decoration:none;color:var(--ink);
+        border:1px solid var(--line);padding:6px 12px;border-radius:6px;background:#fff;margin:0 4px}
+  h2{font-size:20px;margin:44px 0 14px;padding-top:12px;border-top:1px solid var(--line)}
+  .entry{background:#fff;border:1px solid var(--line);border-radius:8px;
+         padding:16px 20px;margin:0 0 14px}
+  .entry .d{font:600 12px ui-monospace,Menlo,monospace;color:var(--muted)}
+  .entry h3{margin:6px 0 8px;font-size:16.5px}
+  .entry p{margin:0 0 8px;font-size:14.5px}
+  .entry p:last-child{margin:0}
+  .tag{display:inline-block;font:600 10.5px ui-monospace,Menlo,monospace;
+       letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:4px;
+       margin-left:6px}
+  .done{background:#e7efe9;color:var(--good);border:1px solid #bcd4c4}
+  .open{background:#f7ecdc;color:#8a5a1d;border:1px solid #e3ceab}
+  .rule{border-left:3px solid var(--accent);padding:10px 16px;background:var(--box);
+        font-size:14.5px;margin:18px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="kicker">Brown Family Sports Inc. · Crossfire research programme</div>
+  <h1>Public roadmap</h1>
+  <p class="sub">Progress on the open questions, tracked where anyone can check it</p>
+  <nav><a href="index.html">← The report</a> <a href="BFS-TR-2026-02.pdf">Paper (PDF)</a></nav>
+</header>
+
+<div class="rule">
+<strong>House rule, applied in public:</strong> rules before results. Every study
+entry below links its criteria to a commit that predates its data, and no
+verdict ships without its sensitivity. If an entry ever violates that, hold us
+to it.
+</div>
+
+<h2>Done</h2>
+
+<div class="entry">
+  <div class="d">2026-09-02 <span class="tag done">done</span></div>
+  <h3>Study 2 — the model axis</h3>
+  <p>Six arms (Opus ×3, Sonnet ×3) against the study-1 baseline. Verdict
+  <strong>R1 — within-family model heterogeneity is load-bearing</strong>:
+  three mechanism flips on the thirteen unanimous clusters, published with the
+  full sensitivity table (strictest reading R2; one auditable call decides).
+  Identical briefs cost 143k / 154k / 199k tokens across the three models.</p>
+</div>
+
+<div class="entry">
+  <div class="d">2026-09-02 <span class="tag done">done</span></div>
+  <h3>Instrument repair, validated on known truth</h3>
+  <p>The pre-registered file-grain metric failed in both directions (a real
+  three-way fork scored 0.000; bookkeeping scored 0.583). The claim-level
+  rubric was registered between studies and validated retroactively: both
+  criteria passed, the hidden fork registers, the ordering inverts correctly.</p>
+</div>
+
+<div class="entry">
+  <div class="d">2026-09-01 <span class="tag done">done</span></div>
+  <h3>Study 1 — nine same-configuration arms</h3>
+  <p>Three real tickets × three arms, futures unreachable by construction,
+  nine of nine valid declarations, mean 143k tokens/arm. Finding: divergence is
+  region-shaped — convergence where the environment decides, forks where the
+  ticket leaves judgement open, and least-confident declarations co-locating
+  with the forks.</p>
+</div>
+
+<h2>Open</h2>
+
+<div class="entry">
+  <div class="d">next <span class="tag open">open</span></div>
+  <h3>Does a cheap declaration pass predict where full arms fork?</h3>
+  <p>The load-bearing question for region-scoped dispatch: if N inexpensive
+  planning-only arms locate the same fork clusters that full implementation
+  arms produce, the expensive mode is only ever needed where the cheap mode
+  points. Criteria will be registered before any run, here.</p>
+</div>
+
+<div class="entry">
+  <div class="d">open <span class="tag open">open</span></div>
+  <h3>Second-codebase replication</h3>
+  <p>All study tickets came from one Rust codebase. A TypeScript application
+  corpus is prepared; the claim-level instrument runs unchanged. Until this
+  lands, nothing here generalises beyond n=1 codebase and we say so.</p>
+</div>
+
+<div class="entry">
+  <div class="d">open <span class="tag open">open</span></div>
+  <h3>Cross-family model axis</h3>
+  <p>Study 2 is a within-family lower bound. Whether cross-family models fork
+  on environment-determined mechanism — the strongest possible form of the
+  heterogeneity claim — needs multi-provider infrastructure and its own
+  registered criteria.</p>
+</div>
+
+<div class="entry">
+  <div class="d">open <span class="tag open">open</span></div>
+  <h3>Interruption surfaces under the effective-false-positive discipline</h3>
+  <p>Any tool that points a human at a fork spends attention. Before shipping
+  heuristic pointers we will measure their effective false-positive rate under
+  Google's behavioural definition (action taken, or not), with the
+  instrumentation logging <em>flagged → acted / dismissed / ignored</em> from
+  day one.</p>
+</div>
+
+<footer style="margin-top:60px;padding-top:18px;border-top:1px solid var(--line);
+               font-size:13px;color:var(--muted)">
+Updates land as dated entries; history stays. Brown Family Sports Inc. ·
+<a href="index.html">report</a> ·
+<a href="https://github.com/parker-brown-family/crossfire-skill">repository</a>
+</footer>
+</div>
+</body>
+</html>

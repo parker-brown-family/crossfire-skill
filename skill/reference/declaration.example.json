@@ -1,0 +1,50 @@
+{
+  "_comment": "EXAMPLE ONLY, from an unrelated imaginary ticket. Copy the SHAPE exactly: same keys, same nesting. surfaces are repo-relative file paths wherever the decision lives in a file; a short stable noun-phrase only for genuinely cross-cutting concerns. 3-8 decided entries is typical. least_confident refs point at decided ids. Do not add keys.",
+  "run_id": "FILLED-IN-BY-YOUR-PROMPT",
+  "ticket": "FILLED-IN-BY-YOUR-PROMPT",
+  "base_sha": "FILLED-IN-BY-YOUR-PROMPT",
+  "config": {
+    "model": "<model-id>",
+    "effort": "<effort-or-default>",
+    "framing": "none",
+    "axis": "same-config"
+  },
+  "decided": [
+    {
+      "id": "d1",
+      "surface": "src/config.rs",
+      "claim": "Parse the config with a hand-rolled line scanner instead of adding a TOML dependency; the file has four keys and the crate tree is dependency-averse."
+    },
+    {
+      "id": "d2",
+      "surface": "src/main.rs",
+      "claim": "Load config once at startup and pass it down; no global, no reload watcher."
+    },
+    {
+      "id": "d3",
+      "surface": "error handling",
+      "claim": "A malformed config line warns and is skipped rather than aborting startup."
+    }
+  ],
+  "least_confident": [
+    {
+      "ref": "d3",
+      "why": "Skipping bad lines silently accepts typos; aborting might be what this codebase's users expect."
+    }
+  ],
+  "not_done": [
+    {
+      "claim": "No reload-on-change.",
+      "why": "Not asked for, and a watcher drags in a dependency."
+    },
+    {
+      "claim": "Behaviour under a config directory (rather than file) unverified.",
+      "why": "Needs a running system to observe."
+    }
+  ],
+  "cost": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "wall_clock_s": 0
+  }
+}
