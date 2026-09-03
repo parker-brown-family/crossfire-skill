@@ -1,0 +1,105 @@
+{
+  "audit": "synthesis",
+  "schema_violations": [],
+  "mapping": {
+    "seed": "804075f86480382d2bd5d4e05096236f47c651c0",
+    "assignment": {
+      "path-1": "PLAN-3",
+      "path-2": "PLAN-1",
+      "path-3": "PLAN-2"
+    }
+  },
+  "contested_by_string": [
+    "q1",
+    "q2",
+    "q3",
+    "q4",
+    "q5",
+    "q6",
+    "q7",
+    "q8",
+    "q9",
+    "q10",
+    "q11",
+    "q12"
+  ],
+  "per_question": {
+    "q1": {
+      "status": "honest",
+      "from": "path-1"
+    },
+    "q2": {
+      "status": "honest",
+      "from": "path-1"
+    },
+    "q3": {
+      "status": "honest",
+      "from": "path-1"
+    },
+    "q4": {
+      "status": "honest",
+      "from": "path-1"
+    },
+    "q5": {
+      "status": "honest",
+      "from": "path-1"
+    },
+    "q6": {
+      "status": "honest",
+      "from": "path-1"
+    },
+    "q7": {
+      "status": "honest",
+      "from": "path-1"
+    },
+    "q8": {
+      "status": "honest",
+      "from": "path-1"
+    },
+    "q9": {
+      "status": "honest",
+      "from": "path-1"
+    },
+    "q10": {
+      "status": "honest",
+      "from": "path-1"
+    },
+    "q11": {
+      "status": "honest",
+      "from": "path-1"
+    },
+    "q12": {
+      "status": "honest",
+      "from": "path-1"
+    }
+  },
+  "false_citations": [],
+  "reattributed": [],
+  "novel_answers": [],
+  "creditable_questions": [
+    "q1",
+    "q2",
+    "q3",
+    "q4",
+    "q5",
+    "q6",
+    "q7",
+    "q8",
+    "q9",
+    "q10",
+    "q11",
+    "q12"
+  ],
+  "distinct_sources_over_creditable": [
+    "path-1"
+  ],
+  "synthesis_credited": false,
+  "single_path_reproducible_by": [
+    "path-1"
+  ],
+  "degradation_events": [],
+  "degradation_suspects": [],
+  "thresholds_missing": [],
+  "undecidable_on_paper": [],
+  "out_of_scope_touched": []
+}

@@ -1,0 +1,69 @@
+{
+  "task": "td196",
+  "answers": {
+    "q1": {
+      "position": "A single modal session picker on Ctrl+Shift+S, built like lang_picker: centred, keyboard-owning, mouse-clickable. No first-paint strip; the window title and F1 help carry the pointer to it.",
+      "surface": "app/src/main.rs",
+      "rationale": "The modal-picker pattern is proven in this file; one surface to build, translate, and maintain."
+    },
+    "q2": {
+      "position": "Active summon with a passive breadcrumb: window_title becomes 'terminal-delight \u2014 2 (+2 saved)' whenever other free sessions exist, and the help modal gains a chord row in all nine language packs.",
+      "surface": "app/src/main.rs",
+      "rationale": "The title already names the held session; extending it breaks the silence without painting a banner over terminals."
+    },
+    "q3": {
+      "position": "Per row: id, tab count plus pane count, absolute saved timestamp, and the last_workspace hint. Tab count comes from cheaply counting '[[tabs]]' headers during the existing scan \u2014 read-only, no format change.",
+      "surface": "app/src/instance.rs",
+      "rationale": "A full-screen modal has room for the richer identification the ticket's mock gestures at ('2 tabs')."
+    },
+    "q4": {
+      "position": "Chord opens the modal listing sessions newest-first; arrows and Enter (or click) choose one. TD claims the target's flock, saves and releases the current session, then rebuilds this same window from the target's StateFile.",
+      "surface": "app/src/main.rs",
+      "rationale": "One window, no proliferation: 'open the other one' replaces the wrong adoption instead of adding a sibling."
+    },
+    "q5": {
+      "position": "Replaced in place: the current session is saved to disk and its lock released, then the window restores the target. Requires making instance's process binding rebindable \u2014 Bound's key behind a mutex, not set-once.",
+      "surface": "app/src/instance.rs",
+      "rationale": "The named refactor is the honest cost of in-place switching; the boot-time restore code already exists to reuse."
+    },
+    "q6": {
+      "position": "The flock stays the arbiter: claim the target BEFORE saving and releasing the current session; on failure show 'session is now live elsewhere' and stay put. Held sessions render greyed and unopenable.",
+      "surface": "app/src/instance.rs",
+      "rationale": "Claim-first ordering means a lost race costs nothing; the kernel lock still guarantees exclusivity."
+    },
+    "q7": {
+      "position": "The chord always opens the modal; with zero or one saved session it shows only the current session plus a 'no other saved sessions' line. The title suffix appears only when others exist.",
+      "surface": "app/src/main.rs",
+      "rationale": "A summonable surface can afford an empty state; the passive hint stays strictly conditional."
+    },
+    "q8": {
+      "position": "Pure recency: saved mtime descending, id as tiebreak, matching the ticket's sketch. rank()'s workspace and substantial keys are adoption policy, not what a human browsing a list expects.",
+      "surface": "app/src/instance.rs",
+      "rationale": "Newest-first is the universal list convention; rank() itself is untouched, satisfying the scope line."
+    },
+    "q9": {
+      "position": "The modal shows 9 rows, then becomes a scrollable list with an 'N sessions' footer; the underlying list is never truncated.",
+      "surface": "app/src/main.rs",
+      "rationale": "Nine rows fill a centred modal comfortably at default size; scroll handles the pathological long tail."
+    },
+    "q10": {
+      "position": "Stateless: the modal rescans sessions on every open, and the title suffix recomputes on each save. Nothing introduced by this feature is persisted anywhere.",
+      "surface": "app/src/main.rs",
+      "rationale": "Disk state (tomls plus locks) is authoritative; a persisted cache could only disagree with it."
+    },
+    "q11": {
+      "position": "Yes: chord, arrows, Enter \u2014 entirely in-process. No environment variable is involved anywhere in this path, not even internally, since no child process is spawned.",
+      "surface": "app/src/main.rs",
+      "rationale": "In-place switching is the only design where even the internal plumbing is env-free."
+    },
+    "q12": {
+      "position": "Yes \u2014 cold launch still silently adopts via untouched resolve_session; switching is strictly a post-launch, user-summoned action that runs after adoption has completed.",
+      "surface": "app/src/instance.rs",
+      "rationale": "The default path gains only a title suffix; its behaviour and ranking are byte-for-byte unchanged."
+    }
+  },
+  "thresholds": {
+    "t1": 9
+  },
+  "out_of_scope_touched": []
+}

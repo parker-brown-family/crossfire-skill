@@ -1,0 +1,73 @@
+{
+  "task": "td196",
+  "latitude": {
+    "genuine": true,
+    "why": "Surface (transient strip vs modal vs persistent badge), open semantics (new window vs in-place swap), display order, and overflow policy are all reviewer-debatable; only flock ownership, the adoption default, and env-free operation are forced."
+  },
+  "answers": {
+    "q1": {
+      "position": "A transient first-paint strip at the top of the adopted window, plus a full session-picker overlay on Ctrl+Shift+S, wired as a pane chord with a window-level fallback like Ctrl+Shift+A.",
+      "surface": "app/src/main.rs",
+      "rationale": "The ticket's own sketch; help-modal and agent-watch overlays already establish both patterns, and Ctrl+Shift+S is unclaimed."
+    },
+    "q2": {
+      "position": "Passive: the strip paints automatically at launch whenever other free sessions exist, naming them; it dismisses on keystroke, click, or roughly eight seconds. The chord plus an F1 help row remain afterwards.",
+      "surface": "app/src/main.rs",
+      "rationale": "Silence breaks at first paint, exactly where #196 locates the defect; nothing to discover before you see it."
+    },
+    "q3": {
+      "position": "Per row: session id, pane count, and saved time (clock time if today, date otherwise) — e.g. '7 · 2 panes · 19:04'. All from scan_sessions' existing Candidate fields.",
+      "surface": "app/src/instance.rs",
+      "rationale": "Matches the sketch; id, panes and mtime are already read cheaply, so no deeper TOML parsing enters the boot path."
+    },
+    "q4": {
+      "position": "Launch adopts newest; strip lists the rest; click a row, or chord then arrows then Enter. TD spawns a detached self-process with TD_SESSION=<id> (demo-spawn pattern); that window claims and restores the session.",
+      "surface": "app/src/main.rs",
+      "rationale": "Reuses the existing explicit-session boot path end to end; no mid-run restore machinery is written."
+    },
+    "q5": {
+      "position": "Nothing changes: the current window keeps its adopted session and the chosen one opens as a new window, matching the one-window-per-session model instance.rs is built around.",
+      "surface": "app/src/main.rs",
+      "rationale": "The module doc treats sessions as windows on a tiling desktop; swapping in place would fight that model."
+    },
+    "q6": {
+      "position": "Yes — the existing per-id flock in claim_in stays the sole arbiter. The picker lists only free sessions via a non-stealing flock probe; losing the spawn race opens a scratch window that says why.",
+      "surface": "app/src/instance.rs",
+      "rationale": "The kernel lock already guarantees single ownership; the UI filters, it never arbitrates."
+    },
+    "q7": {
+      "position": "Zero other free sessions — which includes the exactly-one case, since launch adopts it — paints no strip. The chord still opens the picker, showing a 'no other saved sessions' empty state.",
+      "surface": "app/src/main.rs",
+      "rationale": "Affordance appears only when actionable; the chord stays discoverable and self-explaining."
+    },
+    "q8": {
+      "position": "The exact rank() order — workspace hint, substantial, recency, id tiebreak — with the adopted session removed. The strip's first row is precisely what the launch would have adopted next.",
+      "surface": "app/src/instance.rs",
+      "rationale": "One ordering rule for adoption and display; this hooks rank() without reordering its policy."
+    },
+    "q9": {
+      "position": "The strip shows at most 3 sessions, then a '+N more — Ctrl+Shift+S' tail; the picker overlay scrolls the full ranked list with no cap.",
+      "surface": "app/src/main.rs",
+      "rationale": "Three rows fit one strip without stealing terminal rows; the overlay absorbs any long tail."
+    },
+    "q10": {
+      "position": "Stateless: scan_sessions reruns at every paint of the strip and every picker open; nothing new is persisted. Strip dismissal lives only in process memory for this run.",
+      "surface": "app/src/main.rs",
+      "rationale": "The tomls and locks on disk are already the truth; caching or persisting a copy invites staleness."
+    },
+    "q11": {
+      "position": "Yes: click a strip row, or chord plus Enter. TD_SESSION is set only inside the spawner's child environment; the user never types or exports an environment variable.",
+      "surface": "app/src/main.rs",
+      "rationale": "Internal reuse of the existing mechanism keeps one boot path while meeting the ticket's no-env-var bar."
+    },
+    "q12": {
+      "position": "Yes — resolve_session is untouched; the strip renders after adoption completes and changes nothing about which session was claimed or how.",
+      "surface": "app/src/instance.rs",
+      "rationale": "The ticket scopes ranking-policy changes out; this plan only reads what adoption already decided."
+    }
+  },
+  "thresholds": {
+    "t1": 3
+  },
+  "out_of_scope_touched": []
+}

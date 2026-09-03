@@ -1,0 +1,94 @@
+{
+  "skill_name": "trident-generate",
+  "skill_hash": "ba64deaffe5af586fcc6c324188987d0a5ce01e8b97d08df827d3cb80b01f3a1",
+  "iteration": 1,
+  "run_id": "293586f5",
+  "agents": [
+    "claude-code"
+  ],
+  "eval_ids": [
+    "td196-plan"
+  ],
+  "side_effect_levels": [
+    "local-only"
+  ],
+  "runs_per_case": 1,
+  "with_baseline": true,
+  "duration_seconds": 531.3,
+  "pass_rates": {
+    "claude-code_with_skill": 1.0,
+    "claude-code_without_skill": 1.0
+  },
+  "runs_completed": 2,
+  "runs_failed_grading": 0,
+  "failed_runs": [],
+  "errors": [],
+  "skipped_runs": [],
+  "tokens": {
+    "input": 68,
+    "cached": 1778677,
+    "non_cached_input": 68,
+    "output": 33822,
+    "reasoning_output": null,
+    "total": 33890,
+    "cached_pct": 1.0
+  },
+  "cost": {
+    "total_usd": 5.811257,
+    "runs_with_cost": 2,
+    "runs_total": 2
+  },
+  "stability": {
+    "groups": [
+      {
+        "eval_id": "td196-plan",
+        "agent": "claude-code",
+        "with_skill": false,
+        "runs": 1,
+        "full_passes": 1,
+        "failures": 0,
+        "flaky": false,
+        "failed_assertions": {}
+      },
+      {
+        "eval_id": "td196-plan",
+        "agent": "claude-code",
+        "with_skill": true,
+        "runs": 1,
+        "full_passes": 1,
+        "failures": 0,
+        "flaky": false,
+        "failed_assertions": {}
+      }
+    ],
+    "flaky_groups": [],
+    "flaky_count": 0
+  },
+  "cleanup": {
+    "source_repo_provider": null,
+    "source_repo_project": "outputs/frozen-td",
+    "remote_branches": [],
+    "pr_numbers": [],
+    "merge_request_numbers": [],
+    "workspaces": 2
+  },
+  "skill_size": {
+    "files": 1,
+    "bytes": 1701,
+    "words": 249,
+    "skill_md": {
+      "bytes": 1701,
+      "words": 249,
+      "body_words": 216
+    },
+    "content_files": [
+      {
+        "path": "SKILL.md",
+        "bytes": 1701,
+        "words": 249,
+        "sha256": "f975cade0808634f9185751c4d9f4b651df7d9faaf9ca3b6eafc36006d0af8ab"
+      }
+    ]
+  },
+  "hooks": {}
+}

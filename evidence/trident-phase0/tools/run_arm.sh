@@ -15,12 +15,16 @@ WS="${3:?workspace dir}"
 SOURCE="${4:-}"
 
 export CLAUDE_CONFIG_DIR="$OUT/claude-config"
+# Undocumented but load-bearing: without this the harness deletes every
+# workspace after grading (runner.py:593), taking the declarations with it.
+# Found the expensive way on the first Run A dispatch; logged as a deviation.
+export ASE_KEEP_WORKSPACE=1
 
 args=(
   run
   --skill "$SKILL"
   --evals "$EVALS"
-  --agents claude-code
+  --agent claude-code
   --agent-model "claude-code=$MODEL"
   --workspace "$WS"
   --timeout "$TIMEOUT"

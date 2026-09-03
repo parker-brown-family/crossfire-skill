@@ -1,0 +1,39 @@
+{
+  "audit": "floor",
+  "files": [
+    "PLAN-1.json",
+    "PLAN-2.json",
+    "PLAN-3.json"
+  ],
+  "parse_errors": [],
+  "three_files": true,
+  "schema_ok": true,
+  "schema_violations": {
+    "PLAN-1.json": [],
+    "PLAN-2.json": [],
+    "PLAN-3.json": []
+  },
+  "latitude_genuine_all": true,
+  "answered_share": {
+    "PLAN-1.json": 1.0,
+    "PLAN-2.json": 1.0,
+    "PLAN-3.json": 1.0
+  },
+  "answered_share_ok": true,
+  "contested_by_string": [
+    "q1",
+    "q2",
+    "q3",
+    "q4",
+    "q5",
+    "q6",
+    "q7",
+    "q8",
+    "q9",
+    "q10",
+    "q11",
+    "q12"
+  ],
+  "contested_ok": true,
+  "passed": true
+}

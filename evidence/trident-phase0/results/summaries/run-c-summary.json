@@ -1,0 +1,94 @@
+{
+  "skill_name": "trident-harmonise",
+  "skill_hash": "709c1652b949eae5857fd1a0e2c611c6ba0f7e5c9db35c8340fbf86e212bdc6c",
+  "iteration": 1,
+  "run_id": "88d9fd5a",
+  "agents": [
+    "claude-code"
+  ],
+  "eval_ids": [
+    "td196-harmonise"
+  ],
+  "side_effect_levels": [
+    "local-only"
+  ],
+  "runs_per_case": 1,
+  "with_baseline": true,
+  "duration_seconds": 298.4,
+  "pass_rates": {
+    "claude-code_with_skill": 1.0,
+    "claude-code_without_skill": 1.0
+  },
+  "runs_completed": 2,
+  "runs_failed_grading": 0,
+  "failed_runs": [],
+  "errors": [],
+  "skipped_runs": [],
+  "tokens": {
+    "input": 22,
+    "cached": 299369,
+    "non_cached_input": 22,
+    "output": 22265,
+    "reasoning_output": null,
+    "total": 22287,
+    "cached_pct": 0.9999
+  },
+  "cost": {
+    "total_usd": 2.580796,
+    "runs_with_cost": 2,
+    "runs_total": 2
+  },
+  "stability": {
+    "groups": [
+      {
+        "eval_id": "td196-harmonise",
+        "agent": "claude-code",
+        "with_skill": false,
+        "runs": 1,
+        "full_passes": 1,
+        "failures": 0,
+        "flaky": false,
+        "failed_assertions": {}
+      },
+      {
+        "eval_id": "td196-harmonise",
+        "agent": "claude-code",
+        "with_skill": true,
+        "runs": 1,
+        "full_passes": 1,
+        "failures": 0,
+        "flaky": false,
+        "failed_assertions": {}
+      }
+    ],
+    "flaky_groups": [],
+    "flaky_count": 0
+  },
+  "cleanup": {
+    "source_repo_provider": null,
+    "source_repo_project": null,
+    "remote_branches": [],
+    "pr_numbers": [],
+    "merge_request_numbers": [],
+    "workspaces": 2
+  },
+  "skill_size": {
+    "files": 1,
+    "bytes": 1744,
+    "words": 265,
+    "skill_md": {
+      "bytes": 1744,
+      "words": 265,
+      "body_words": 231
+    },
+    "content_files": [
+      {
+        "path": "SKILL.md",
+        "bytes": 1744,
+        "words": 265,
+        "sha256": "e8eaf45ce2d988a46ce9970a75b7d244da5134d269fdd32c0d785f797b963c4c"
+      }
+    ]
+  },
+  "hooks": {}
+}

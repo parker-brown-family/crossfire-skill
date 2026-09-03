@@ -1,0 +1,50 @@
+{
+  "task": "td178",
+  "latitude": {
+    "genuine": true,
+    "why": "Exec semantics (direct exec vs typed into a shell), how a commanded window interacts with session adoption, parser choice, and dir-flag spelling are reviewer-debatable; desktop keys and app-id plumbing are forced."
+  },
+  "answers": {
+    "q1": {
+      "position": "Accept `-e`; remaining argv is the command. TD spawns the user's shell in the pane, shell-escapes the argv, and types the line into the PTY — the exact mechanism new_restored uses for TD_SEED_RESUME.",
+      "surface": "app/src/pane.rs",
+      "rationale": "Reuses the proven resume path; when the agent exits the user keeps a live shell instead of a vanished window."
+    },
+    "q2": {
+      "position": "Parse `--app-id=<id>` (= or space form) and plumb it into WindowOptions.app_id at cx.open_window, replacing the hard-coded \"terminal-delight\"; absent flag keeps the default.",
+      "surface": "app/src/main.rs",
+      "rationale": "app_id set before the window maps, so compositor rules match on first map — no post-open set_app_id race."
+    },
+    "q3": {
+      "position": "`--working-directory=<dir>` (foot's spelling) becomes the seed cwd — session::PaneRestore.cwd into term::spawn_in(cwd), the same plumbing TD_SEED_CWD uses; a vanished dir falls back safely.",
+      "surface": "app/src/main.rs",
+      "rationale": "spawn_in(cwd) exists; foot-parity spelling also serves callers that bypass xdg-terminal-exec with foot-shaped args."
+    },
+    "q4": {
+      "position": "`--title=<t>` overrides window_title() in TitlebarOptions at open; declared to consumers as X-TerminalArgTitle=--title= in packaging/terminal-delight.desktop.",
+      "surface": "app/src/main.rs",
+      "rationale": "Title already flows through TitlebarOptions; the desktop key is where xdg-terminal-exec learns the flag."
+    },
+    "q5": {
+      "position": "Add exactly four keys to packaging/terminal-delight.desktop: X-TerminalArgExec=-e, X-TerminalArgAppId=--app-id=, X-TerminalArgTitle=--title=, X-TerminalArgDir=--working-directory=. Every existing key stays.",
+      "surface": "packaging/terminal-delight.desktop",
+      "rationale": "Mirrors omarchy's shipped foot.desktop — the exact contract omarchy-launch-tui and xdg-terminal-exec consume."
+    },
+    "q6": {
+      "position": "Unchanged: a bare launch adopts the most-recently-saved unheld session and restores it (instance::resolve_session); flag_reply still answers --help/--version and refuses unknown flags without opening a window.",
+      "surface": "app/src/main.rs",
+      "rationale": "Existing behaviour is tested and deliberate; the ticket adds surface, it must not change the default."
+    },
+    "q7": {
+      "position": "Hand-rolled: a small parse_launch_args() in main.rs, run after the verb dispatch and ahead of flag_reply so the new flags aren't refused; no new crate.",
+      "surface": "app/src/main.rs",
+      "rationale": "The repo has zero arg-crate deps by design; four flags plus terminal -e don't justify one."
+    },
+    "q8": {
+      "position": "A commanded window never adopts an existing saved session, but it claims a FRESH session id and persists like a normal window — its typed command line is recorded, so crash recovery reopens the agent.",
+      "surface": "app/src/instance.rs",
+      "rationale": "The session-recovery machinery exists so agent panes survive crashes; scratch would exempt every `omarchy agent` window from it."
+    }
+  },
+  "out_of_scope_touched": []
+}

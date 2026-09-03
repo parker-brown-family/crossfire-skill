@@ -1,0 +1,73 @@
+{
+  "task": "td196",
+  "latitude": {
+    "genuine": true,
+    "why": "Surface (transient strip vs modal vs persistent badge), open semantics (new window vs in-place swap), display order, and overflow policy are all reviewer-debatable; only flock ownership, the adoption default, and env-free operation are forced."
+  },
+  "answers": {
+    "q1": {
+      "position": "A persistent sessions badge ('⧉ N') in the top-right icon row beside the help icon, visible while other free sessions exist; clicking it, or Ctrl+Shift+S, drops a session menu under it.",
+      "surface": "app/src/main.rs",
+      "rationale": "The hicon row already hosts always-on affordances; a standing count belongs with them, not in transient chrome."
+    },
+    "q2": {
+      "position": "Passive and persistent: the badge stays on screen the whole run while other free sessions exist — not only at first paint — so the count itself breaks the silence and survives looking away.",
+      "surface": "app/src/main.rs",
+      "rationale": "A transient strip is missable during launch; a standing count is TD permanently admitting how many sessions exist."
+    },
+    "q3": {
+      "position": "Menu row: id, pane count, relative age ('2h', 'Aug 27'), and the last_workspace hint when recorded — every field the existing Candidate struct already carries out of scan_sessions.",
+      "surface": "app/src/instance.rs",
+      "rationale": "The workspace hint answers 'which one is mine' on a tiling desktop; no new parsing is required."
+    },
+    "q4": {
+      "position": "Launch adopts newest; badge shows '⧉ N'. Click the badge or press the chord, pick a row by click or arrows+Enter; a detached self-spawn with TD_SESSION=<id> claims and restores it in a new window.",
+      "surface": "app/src/main.rs",
+      "rationale": "The demo-window spawn already shows the detached self-exec pattern; the child runs the normal explicit-session boot."
+    },
+    "q5": {
+      "position": "Untouched: the current window keeps its session and the target opens as its own window — one window per session, exactly the model instance.rs documents for a tiling compositor.",
+      "surface": "app/src/main.rs",
+      "rationale": "New-window semantics need no rebinding of the process-wide session lock and cannot lose unsaved layout."
+    },
+    "q6": {
+      "position": "The existing claim_in flock is the only arbiter. The menu probes locks non-destructively (the legacy_master_live_at pattern) and greys held sessions as 'live'; a lost spawn race yields a scratch window naming the conflict.",
+      "surface": "app/src/instance.rs",
+      "rationale": "Kernel-held flocks already make double adoption impossible; the UI only reports what the probe saw."
+    },
+    "q7": {
+      "position": "Zero other free sessions — including the common single-session install — hides the badge entirely; the chord still opens the menu with an empty-state line. No dead chrome in the default case.",
+      "surface": "app/src/main.rs",
+      "rationale": "A permanent badge must earn its pixels; most installs have one session and should see nothing."
+    },
+    "q8": {
+      "position": "rank() order with the adopted id removed, so the menu mirrors adoption: the top row is the next session a cold launch would have taken. Greyed live sessions sink to a tail.",
+      "surface": "app/src/instance.rs",
+      "rationale": "Showing adoption's own order teaches the ranking; rank() is called, its policy never reordered."
+    },
+    "q9": {
+      "position": "The menu shows 5 rows, then a final '…and N more' row that expands it into a scrolling list of everything.",
+      "surface": "app/src/main.rs",
+      "rationale": "Five rows keep a dropdown menu-sized; expansion covers hoarders without a second surface."
+    },
+    "q10": {
+      "position": "Stateless: badge count and menu contents come from rescanning the sessions directory, refreshed on save and focus events; nothing introduced here persists across restarts.",
+      "surface": "app/src/main.rs",
+      "rationale": "The on-disk tomls and locks are the single source of truth; the badge is a live view, not state."
+    },
+    "q11": {
+      "position": "Yes: the whole flow is click-only if you want (badge, then row); TD_SESSION appears solely inside the spawned child's environment, never typed or exported by the user.",
+      "surface": "app/src/main.rs",
+      "rationale": "Mouse-only completion is the strongest possible answer to 'an env var, from a shell, to open a terminal'."
+    },
+    "q12": {
+      "position": "Yes — adoption at cold launch is byte-for-byte unchanged; the badge is additive chrome painted after resolve_session has already decided, and it never intercepts the boot path.",
+      "surface": "app/src/instance.rs",
+      "rationale": "The feature reads adoption's leftovers; it takes no part in choosing the adopted session."
+    }
+  },
+  "thresholds": {
+    "t1": 5
+  },
+  "out_of_scope_touched": []
+}

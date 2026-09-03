@@ -1,0 +1,49 @@
+{
+  "audit": "f1",
+  "files": [
+    "PLAN-1.json",
+    "PLAN-2.json",
+    "PLAN-3.json"
+  ],
+  "parse_errors": [],
+  "latitude_claimed_genuine": true,
+  "declined_multiplicity": false,
+  "classification_matrix": {
+    "q1": [
+      "correct",
+      "correct",
+      "correct"
+    ],
+    "q2": [
+      "correct",
+      "correct",
+      "correct"
+    ],
+    "q3": [
+      "correct",
+      "correct",
+      "correct"
+    ],
+    "q4": [
+      "correct",
+      "correct",
+      "correct"
+    ],
+    "q5": [
+      "correct",
+      "correct",
+      "correct"
+    ],
+    "q6": [
+      "correct",
+      "correct",
+      "correct"
+    ]
+  },
+  "contra_questions": [],
+  "unclassified_rate": 0.0,
+  "instrument_insufficient": false,
+  "f1_hard_fired": false,
+  "f1_soft_flagged": true,
+  "reading": "flagged: three paths under claimed latitude without spec contradiction - human trio read, disposition recorded as OPEN"
+}

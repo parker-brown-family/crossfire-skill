@@ -1,0 +1,35 @@
+{
+  "audit": "f1",
+  "files": [
+    "PLAN-1.json"
+  ],
+  "parse_errors": [],
+  "latitude_claimed_genuine": true,
+  "declined_multiplicity": true,
+  "classification_matrix": {
+    "q1": [
+      "correct"
+    ],
+    "q2": [
+      "correct"
+    ],
+    "q3": [
+      "correct"
+    ],
+    "q4": [
+      "correct"
+    ],
+    "q5": [
+      "correct"
+    ],
+    "q6": [
+      "correct"
+    ]
+  },
+  "contra_questions": [],
+  "unclassified_rate": 0.0,
+  "instrument_insufficient": false,
+  "f1_hard_fired": false,
+  "f1_soft_flagged": false,
+  "reading": "not fired"
+}

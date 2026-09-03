@@ -1,0 +1,73 @@
+{
+  "task": "td196",
+  "latitude": {
+    "genuine": true,
+    "why": "Picker vs strip, new-window vs in-place session swap, spawn-with-env vs in-process reclaim, and list ordering are all materially debatable; the ticket only sketches a direction."
+  },
+  "answers": {
+    "q1": {
+      "position": "Two surfaces in the main window: a first-paint strip naming other free sessions, and a session picker overlay on Ctrl+Shift+S (listed in the help panel's Window section).",
+      "surface": "app/src/main.rs",
+      "rationale": "Matches the ticket sketch; overlay + chord + help-row is TD's established pattern (Ctrl+Shift+A/U/D)."
+    },
+    "q2": {
+      "position": "Passive first: the strip appears unprompted at first paint whenever other free saved sessions exist, auto-dismissing on keypress/click. The chord-summoned picker is the persistent active route thereafter.",
+      "surface": "app/src/main.rs",
+      "rationale": "The defect is silence; only an unsummoned surface breaks it. A chord alone requires knowledge the user provably lacks."
+    },
+    "q3": {
+      "position": "Per session: id, pane count, tab count, humanized last-saved time (mtime), last_workspace hint if recorded, plus live/current badges. No titles or content previews.",
+      "surface": "app/src/instance.rs",
+      "rationale": "All derivable from scan_sessions' cheap line scan (tabs counted via [[tabs]] headers); previews need full deserialization sessions don't earn."
+    },
+    "q4": {
+      "position": "Launch adopts newest as today; strip names the rest. Ctrl+Shift+S (or clicking the strip) opens the picker, arrows/click select, Enter spawns a detached TD process with TD_SESSION=<id> set programmatically; that window claims and restores it.",
+      "surface": "app/src/main.rs",
+      "rationale": "Reuses the proven current_exe+env+setsid spawn (demo/scratch) and resolve_session's precedence-#1 path unmodified."
+    },
+    "q5": {
+      "position": "New window; the current window keeps its adopted session untouched and live. No in-place replacement.",
+      "surface": "app/src/main.rs",
+      "rationale": "One-window-per-session is TD's model; in-place swap risks the release/claim/save races #189 and #195 fought."
+    },
+    "q6": {
+      "position": "Yes, exclusive: the opened window takes the existing kernel flock via claim_in. A losing race boots per existing TD_SESSION-taken behaviour (scratch, stderr notice). Picker shows advisory live badges from a non-destructive probe.",
+      "surface": "app/src/instance.rs",
+      "rationale": "The flock is already the single arbiter; adding no second mechanism means no new races."
+    },
+    "q7": {
+      "position": "Strip: only when at least one other free saved session exists, so absent with zero saved or exactly one (the adopted). Picker chord always opens, showing the current session and a 'no other saved sessions' line.",
+      "surface": "app/src/main.rs",
+      "rationale": "No false invitations at first paint; a chord that silently does nothing is the #277 bug repeated."
+    },
+    "q8": {
+      "position": "Current session pinned first (badged), then the exact rank() order adoption uses: workspace-hint, then substantial, then newest, id tiebreak.",
+      "surface": "app/src/instance.rs",
+      "rationale": "One ordering rule, already tested; the list's top row explains what adoption just did."
+    },
+    "q9": {
+      "position": "Strip shows at most 2 other sessions inline, then collapses to 'N other saved sessions — Ctrl+Shift+S'. Picker shows 8 rows before scrolling; all sessions remain reachable by scroll.",
+      "surface": "app/src/main.rs",
+      "rationale": "2 matches the ticket sketch's strip; 8 keeps the overlay one screen while covering realistic session counts."
+    },
+    "q10": {
+      "position": "Stateless per launch: no new files, no new session-file fields, no persisted dismissal. Everything is recomputed from the sessions/ directory at paint and on each chord press.",
+      "surface": "-",
+      "rationale": "The file format is out of scope, and a rescan is cheap; persisted UI state would drift from disk truth."
+    },
+    "q11": {
+      "position": "Yes. Strip → chord → picker → Enter completes the flow entirely in the UI; TD_SESSION is set programmatically on the spawned child, never typed by the user.",
+      "surface": "app/src/main.rs",
+      "rationale": "This is the ticket's Done-when; the env var survives untouched as the scripting escape hatch."
+    },
+    "q12": {
+      "position": "Yes, unchanged: resolve_session, rank, and claim_in are not reordered or edited on the adoption path; the strip renders after adoption completes and requires no interaction.",
+      "surface": "app/src/instance.rs",
+      "rationale": "The ticket scopes this to a UI surface over existing plumbing; #195's behaviour is the baseline, not the patient."
+    }
+  },
+  "thresholds": {
+    "t1": 8
+  },
+  "out_of_scope_touched": []
+}

@@ -1,0 +1,58 @@
+{
+  "task": "td196",
+  "answers": {
+    "q1": {
+      "adopted_from": "path-1",
+      "position": "A persistent sessions badge ('⧉ N') in the top-right icon row beside the help icon, visible while other free sessions exist; clicking it, or Ctrl+Shift+S, drops a session menu under it."
+    },
+    "q2": {
+      "adopted_from": "path-1",
+      "position": "Passive and persistent: the badge stays on screen the whole run while other free sessions exist — not only at first paint — so the count itself breaks the silence and survives looking away."
+    },
+    "q3": {
+      "adopted_from": "path-1",
+      "position": "Menu row: id, pane count, relative age ('2h', 'Aug 27'), and the last_workspace hint when recorded — every field the existing Candidate struct already carries out of scan_sessions."
+    },
+    "q4": {
+      "adopted_from": "path-1",
+      "position": "Launch adopts newest; badge shows '⧉ N'. Click the badge or press the chord, pick a row by click or arrows+Enter; a detached self-spawn with TD_SESSION=<id> claims and restores it in a new window."
+    },
+    "q5": {
+      "adopted_from": "path-1",
+      "position": "Untouched: the current window keeps its session and the target opens as its own window — one window per session, exactly the model instance.rs documents for a tiling compositor."
+    },
+    "q6": {
+      "adopted_from": "path-1",
+      "position": "The existing claim_in flock is the only arbiter. The menu probes locks non-destructively (the legacy_master_live_at pattern) and greys held sessions as 'live'; a lost spawn race yields a scratch window naming the conflict."
+    },
+    "q7": {
+      "adopted_from": "path-1",
+      "position": "Zero other free sessions — including the common single-session install — hides the badge entirely; the chord still opens the menu with an empty-state line. No dead chrome in the default case."
+    },
+    "q8": {
+      "adopted_from": "path-1",
+      "position": "rank() order with the adopted id removed, so the menu mirrors adoption: the top row is the next session a cold launch would have taken. Greyed live sessions sink to a tail."
+    },
+    "q9": {
+      "adopted_from": "path-1",
+      "position": "The menu shows 5 rows, then a final '…and N more' row that expands it into a scrolling list of everything."
+    },
+    "q10": {
+      "adopted_from": "path-1",
+      "position": "Stateless: badge count and menu contents come from rescanning the sessions directory, refreshed on save and focus events; nothing introduced here persists across restarts."
+    },
+    "q11": {
+      "adopted_from": "path-1",
+      "position": "Yes: the whole flow is click-only if you want (badge, then row); TD_SESSION appears solely inside the spawned child's environment, never typed or exported by the user."
+    },
+    "q12": {
+      "adopted_from": "path-1",
+      "position": "Yes — adoption at cold launch is byte-for-byte unchanged; the badge is additive chrome painted after resolve_session has already decided, and it never intercepts the boot path."
+    }
+  },
+  "thresholds": {
+    "t1": 5
+  },
+  "undecidable_on_paper": [],
+  "out_of_scope_touched": []
+}
