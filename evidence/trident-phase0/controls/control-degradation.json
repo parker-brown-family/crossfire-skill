@@ -1,0 +1,12 @@
+{
+  "task": "mini",
+  "answers": {
+    "q1": { "adopted_from": "path-1", "position": "An overlay picker summoned by a keybinding" },
+    "q2": { "adopted_from": "path-1", "position": "Sessions named by id and newest-first timestamp" },
+    "q3": { "adopted_from": "path-1", "position": "Zero sessions: the affordance is hidden entirely" },
+    "q4": { "adopted_from": "path-1", "position": "Yes - the whole flow works with no environment variable" },
+    "q5": { "adopted_from": "novel", "position": "No - the default is replaced by a mandatory picker at every launch", "modification": "synthetic degradation case" }
+  },
+  "undecidable_on_paper": [],
+  "out_of_scope_touched": []
+}

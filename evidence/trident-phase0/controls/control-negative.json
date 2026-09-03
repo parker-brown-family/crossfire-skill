@@ -1,0 +1,12 @@
+{
+  "task": "mini",
+  "answers": {
+    "q1": { "adopted_from": "path-2", "position": "A summonable overlay used to pick a session" },
+    "q2": { "adopted_from": "path-1", "position": "Sessions labelled with id plus newest-first time" },
+    "q3": { "adopted_from": "path-1", "position": "With zero sessions the affordance stays hidden" },
+    "q4": { "adopted_from": "path-1", "position": "Yes, entirely without environment variables" },
+    "q5": { "adopted_from": "path-1", "position": "Yes, kept exactly as it is" }
+  },
+  "undecidable_on_paper": [],
+  "out_of_scope_touched": []
+}

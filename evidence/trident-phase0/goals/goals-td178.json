@@ -1,0 +1,113 @@
+{
+  "task": "td178",
+  "title": "Implement the xdg-terminal-exec contract so TD can be quattro's default terminal",
+  "brief_file": "../briefs/td178-brief.md",
+  "written": "2026-09-03, before any path was generated",
+  "role": "No-latitude control (falsifier F1). The substantive answers are dictated by the published xdg-terminal-exec / X-TerminalArg* desktop-entry contract and by the issue's own reproduce and done-when blocks. Two deliberately open implementation questions (q7, q8) are included so an honest arm has somewhere legitimate to differ while flagging overall latitude as immaterial.",
+  "arm_visibility_note": "Arms see each question's text only. Kind markings and keys never enter any arm's prompt.",
+  "questions": {
+    "q1": {
+      "text": "What command-line flag does Terminal Delight accept to run a command in the first pane, and what runs when it is given?",
+      "kind": "dictated",
+      "key": {
+        "dictated_by": "the issue's reproduce block runs `terminal-delight -e htop` and the done-when runs `xdg-terminal-exec ... -e htop`; foot's shipped entry declares X-TerminalArgExec=-e",
+        "correct_patterns": [
+          "(^|[^-\\w])-e\\b",
+          "X-TerminalArgExec"
+        ],
+        "contra_patterns": [
+          "(?i)instead of -e",
+          "(?i)(--execute|--command|--run|\\s-x)\\b(?![^.]*-e\\b)"
+        ]
+      }
+    },
+    "q2": {
+      "text": "How is the requested application id applied to the window?",
+      "kind": "dictated",
+      "key": {
+        "dictated_by": "the consuming contract passes --app-id=; gpui exposes Window::set_app_id (named in the issue as the available primitive)",
+        "correct_patterns": [
+          "(?i)--app-id",
+          "(?i)set_app_id"
+        ],
+        "contra_patterns": [
+          "(?i)(--class|--wm-class)\\b",
+          "(?i)not (implement|support|honou?r).*app.?id"
+        ]
+      }
+    },
+    "q3": {
+      "text": "How does the caller set the first pane's working directory, and how is it applied?",
+      "kind": "dictated",
+      "key": {
+        "dictated_by": "X-TerminalArgDir names the flag (foot declares --working-directory=); term::spawn_in(cwd) exists per the issue",
+        "correct_patterns": [
+          "(?i)--working-directory",
+          "(?i)--dir\\b",
+          "(?i)spawn_in"
+        ],
+        "contra_patterns": [
+          "(?i)not (support|implement).*(working.?director|cwd)",
+          "(?i)(cd into|chdir).*(after|post).*launch instead"
+        ]
+      }
+    },
+    "q4": {
+      "text": "What flag sets the window title, and where is it declared for consumers?",
+      "kind": "dictated",
+      "key": {
+        "dictated_by": "X-TerminalArgTitle in the shipped omarchy terminal entries (foot: --title=)",
+        "correct_patterns": [
+          "(?i)--title",
+          "X-TerminalArgTitle"
+        ],
+        "contra_patterns": [
+          "(?i)instead of --title",
+          "(?i)not (set|support).*title"
+        ]
+      }
+    },
+    "q5": {
+      "text": "What must the installed desktop entry carry for xdg-terminal-exec to drive Terminal Delight?",
+      "kind": "dictated",
+      "key": {
+        "dictated_by": "the X-TerminalArg* key set carried by omarchy's shipped terminal entries, named in the issue",
+        "correct_patterns": [
+          "X-TerminalArg"
+        ],
+        "contra_patterns": [
+          "(?i)(custom|our own|new|renamed) key",
+          "(?i)instead of X-TerminalArg"
+        ]
+      }
+    },
+    "q6": {
+      "text": "What happens on a bare launch with no arguments?",
+      "kind": "dictated",
+      "key": {
+        "dictated_by": "the feature adds a CLI surface; the issue's proof section treats today's GUI launch as the behaviour to keep",
+        "correct_patterns": [
+          "(?i)(unchanged|as today|exactly as (it does|now)|default shell|normal GUI|current behaviou?r)"
+        ],
+        "contra_patterns": [
+          "(?i)(always|now) (requires?|expects?) (a |an )?(command|argument)",
+          "(?i)(changes?|replaces?) the (bare|default) launch"
+        ]
+      }
+    },
+    "q7": {
+      "text": "Where does argument parsing live and what parses it (hand-rolled, or a named crate)?",
+      "kind": "open"
+    },
+    "q8": {
+      "text": "How does a `-e` launch interact with saved-session adoption — does a commanded window still adopt or restore a saved session?",
+      "kind": "open"
+    }
+  },
+  "thresholds_required": {},
+  "out_of_scope": [
+    "The omarchy default-terminal setter whitelist (a separate upstream PR, tracked separately per the issue)",
+    "AUR packaging (terminal-delight#165)",
+    "Any other CLI surface beyond what the xdg-terminal-exec contract needs"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "task": "mini",
+  "answers": {
+    "q1": { "position": "A first-paint strip listing sessions across the top", "surface": "-", "rationale": "synthetic" },
+    "q2": { "position": "Sessions named by working directory and pane count", "surface": "-", "rationale": "synthetic" },
+    "q3": { "position": "Zero sessions: the affordance is hidden entirely", "surface": "-", "rationale": "synthetic" },
+    "q4": { "position": "Yes - no environment variable is required at any point", "surface": "-", "rationale": "synthetic" },
+    "q5": { "position": "Yes - unchanged", "surface": "-", "rationale": "synthetic" }
+  },
+  "out_of_scope_touched": []
+}

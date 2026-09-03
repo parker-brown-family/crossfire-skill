@@ -1,0 +1,30 @@
+{
+  "task": "mini",
+  "title": "Synthetic control task for auditor validation",
+  "written": "2026-09-03, hand-built; answers to every control are known in advance",
+  "questions": {
+    "q1": { "text": "Where does the affordance live?", "kind": "open" },
+    "q2": { "text": "How is a session identified to a human?", "kind": "open" },
+    "q3": { "text": "What happens with zero sessions?", "kind": "open" },
+    "q4": {
+      "text": "Can the flow be completed without an environment variable?",
+      "kind": "dictated",
+      "key": {
+        "dictated_by": "synthetic",
+        "correct_patterns": ["(?i)no env(ironment)? var", "(?i)\\byes\\b"],
+        "contra_patterns": ["(?i)sets? TD_SESSION", "(?i)via an env(ironment)? var"]
+      }
+    },
+    "q5": {
+      "text": "Is the cold-launch default preserved?",
+      "kind": "dictated",
+      "key": {
+        "dictated_by": "synthetic",
+        "correct_patterns": ["(?i)\\byes\\b", "(?i)unchanged"],
+        "contra_patterns": ["(?i)\\bno\\b", "(?i)replaced"]
+      }
+    }
+  },
+  "thresholds_required": {},
+  "out_of_scope": ["synthetic out-of-scope item"]
+}

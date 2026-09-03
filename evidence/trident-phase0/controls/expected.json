@@ -1,0 +1,15 @@
+{
+  "positive": {
+    "synthesis_credited": true,
+    "false_citations": [],
+    "degradation_events": [],
+    "single_path_reproducible_by": []
+  },
+  "negative": {
+    "synthesis_credited": false
+  },
+  "degradation": {
+    "degradation_events": ["q5"],
+    "false_citations": []
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "skill_name": "trident-harmonise",
+  "evals": [
+    {
+      "id": "td196-harmonise",
+      "prompt": "Three candidate paths through one ticket sit in this workspace as path-1.json, path-2.json and path-3.json, with the goal outcomes they must serve in goals-questions.md. They were produced elsewhere; you have no other context on how, and their order carries no meaning. Work on paper only: judge against the stated goals and questions, do not use the network, and do not bring in outside knowledge of the codebase.\n\nProduce the single plan that should go forward. Write it to HARMONISED.json at the workspace root, valid JSON in this shape:\n\n{\n  \"task\": \"td196\",\n  \"answers\": {\n    \"q1\": {\"adopted_from\": \"path-1\" or \"path-2\" or \"path-3\" or \"novel\",\n           \"position\": \"copied VERBATIM from the source path's position for this question; your own text only when adopted_from is novel\",\n           \"modification\": \"at most 25 words; optional\"}\n    // ... one entry per question id, q1 through q12 ...\n  },\n  \"thresholds\": {\"t1\": <number>},\n  \"undecidable_on_paper\": [],\n  \"out_of_scope_touched\": []\n}\n\nundecidable_on_paper lists any question id where the paths cannot be told apart on paper against these goals; an empty list claims every question was decidable. An empty out_of_scope_touched list claims the plan touches none of the out-of-scope items stated in goals-questions.md. You may write working notes to HARMONISED.notes.md; only HARMONISED.json is assessed.",
+      "expected_output": "A single plan at HARMONISED.json, valid JSON per the stated contract, with per-question provenance and an explicit undecidable_on_paper list.",
+      "files": [
+        "files/goals-questions.md",
+        "files/path-1.json",
+        "files/path-2.json",
+        "files/path-3.json"
+      ],
+      "force_skill_invocation": true,
+      "side_effect_level": "local-only",
+      "assertions": [
+        {
+          "type": "file_exists",
+          "path": "HARMONISED.json"
+        },
+        {
+          "type": "json_path",
+          "path": "HARMONISED.json",
+          "json_path": "answers.q1.adopted_from"
+        },
+        {
+          "type": "json_path",
+          "path": "HARMONISED.json",
+          "json_path": "undecidable_on_paper"
+        },
+        {
+          "type": "json_path_not_exists",
+          "path": "HARMONISED.json",
+          "json_path": "out_of_scope_touched.0"
+        }
+      ]
+    }
+  ]
+}

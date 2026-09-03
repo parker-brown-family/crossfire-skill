@@ -1,0 +1,34 @@
+{
+  "skill_name": "trident-generate",
+  "evals": [
+    {
+      "id": "td178-plan",
+      "prompt": "You are planning work on this repository. Below is a ticket and the planning questions your plan must take a position on. Plan only: do not implement the ticket, do not modify tracked files, do not run builds, and do not use the network. Read the repository as needed to ground your decisions.\n\n<ticket>\n# feat: implement the xdg-terminal-exec contract so TD can be quattro's default terminal\n\nSource: https://github.com/parker-brown-family/terminal-delight/issues/178 \u2014 verbatim snapshot 2026-09-03, base commit 9707696.\n\n## Problem\nTD cannot run a command at launch (no `-e`), set a window app-id, or honor the `X-TerminalArg*` desktop-entry contract \u2014 so it cannot occupy Omarchy quattro's default-terminal slot (`~/.config/xdg-terminals.list`, consumed by `xdg-terminal-exec`) and `omarchy agent` / `omarchy-launch-tui` cannot land agents in TD panes. Surface: CLI handling in `app/src/main.rs`; `packaging/terminal-delight.desktop`.\n\n## Proof it's real\n- `terminal-delight --help` launches the GUI \u2014 there is no CLI arg surface at all (verified 2026-08-29; also bit the 2026-08-29 session-recovery work).\n- `packaging/terminal-delight.desktop` carries only Type/Name/Exec/Icon/Categories \u2014 none of the `X-TerminalArgExec/AppId/Title/Dir` keys Omarchy's shipped terminal entries carry (compare `/usr/share/omarchy/applications/foot.desktop` on omarchy 4.0.1: `X-TerminalArgExec=-e`, `X-TerminalArgAppId=--app-id=`, `X-TerminalArgTitle=--title=`, `X-TerminalArgDir=--working-directory=`).\n- The consuming contract is live on quattro: `/usr/bin/omarchy-launch-tui` execs `xdg-terminal-exec --app-id=$APP_ID -e \"$1\" \u2026`; `omarchy-launch-terminal` passes `--dir=`.\n- gpui already exposes the needed primitive (`Window::set_app_id`, present in the pinned checkout), and `term::spawn_in(cwd)` already exists \u2014 the gap is pure CLI plumbing + desktop keys.\n\n## Reproduce\n```\napp/target/release/terminal-delight -e htop\n```\nhtop does not run; TD opens its normal GUI with the default shell (the args are not parsed).\n\n## Verify it IS a problem\n`grep -nE '\"-e\"|app-id|working-directory|--title' app/src/main.rs` \u2192 no CLI handling of these args, and the desktop file has no `X-TerminalArg*` keys.\n**Invalidate:** if a current build runs `terminal-delight -e htop` in its first pane AND the installed desktop entry carries the four `X-TerminalArg*` keys \u2192 this is already done; close `invalid` with the commit that shipped it.\n\n## Done when\nWith `terminal-delight.desktop` first in `~/.config/xdg-terminals.list`:\n- `xdg-terminal-exec --app-id=test.td --dir=/tmp -e htop` opens a TD window whose Wayland app-id is `test.td`, first pane cwd `/tmp`, running htop; and\n- `omarchy-launch-tui --app-id=org.omarchy.agent claude` lands claude in a TD pane (i.e. `omarchy agent` works with TD as the default terminal).\n(The `omarchy default terminal` *setter* whitelists four terminals \u2014 hand-written `xdg-terminals.list` works today; a 4-line PR to basecamp/omarchy adds TD to the case list. Track that separately once this lands.)\n\n## Behaviour\nGiven Omarchy quattro with terminal-delight.desktop listed first in ~/.config/xdg-terminals.list\nWhen the user runs `omarchy agent` (or any omarchy-launch-tui command)\nThen the agent opens inside a Terminal Delight pane under app-id org.omarchy.agent, in the caller's working directory\n\n## Context\nFoundation interrogation 2026-08-29, \u00a76 opportunity 1: `docs/2026-08-29-foundation-interrogation-zed-gpui-quickshell.md` (branch `docs/foundation-interrogation`). Related: #165 (AUR packaging \u2014 same desktop-entry surface). APES ticket: interrogate-the-zed-gpui-foundation-\u2026-mteerrs6.\n</ticket>\n\nYour plan must take a clear position on every one of these questions:\n\n- q1: What command-line flag does Terminal Delight accept to run a command in the first pane, and what runs when it is given?\n- q2: How is the requested application id applied to the window?\n- q3: How does the caller set the first pane's working directory, and how is it applied?\n- q4: What flag sets the window title, and where is it declared for consumers?\n- q5: What must the installed desktop entry carry for xdg-terminal-exec to drive Terminal Delight?\n- q6: What happens on a bare launch with no arguments?\n- q7: Where does argument parsing live and what parses it (hand-rolled, or a named crate)?\n- q8: How does a `-e` launch interact with saved-session adoption \u2014 does a commanded window still adopt or restore a saved session?\n\nOut of scope for this ticket (a plan touching one must say so): The omarchy default-terminal setter whitelist (a separate upstream PR, tracked separately per the issue); AUR packaging (terminal-delight#165); Any other CLI surface beyond what the xdg-terminal-exec contract needs\n\nOutput contract, follow it exactly. Write your plan as a declaration file at the repository root named PLAN-1.json. If your method produces several plans, number them PLAN-2.json, PLAN-3.json; with no instruction otherwise, produce one. Each file must be valid JSON in this shape:\n\n{\n  \"task\": \"td178\",\n  \"latitude\": {\"genuine\": true or false, \"why\": \"at most 40 words. true only if MATERIAL design decisions are open - decisions a reviewer would debate; implementation trivia does not count\"},\n  \"answers\": {\n    \"q1\": {\"position\": \"your decision, at most 35 words, stated as a decision rather than a discussion\",\n           \"surface\": \"the repository path most affected, or '-'\",\n           \"rationale\": \"at most 25 words\"}\n    // ... one entry per question id listed above, q1 through q8 ...\n  },\n  \"out_of_scope_touched\": []\n}\n\nAn empty out_of_scope_touched list claims your plan touches none of the stated out-of-scope items. You may write free-form working notes to PLAN-<n>.notes.md; only the .json files are assessed.",
+      "expected_output": "One or more plan declarations at PLAN-<n>.json, each valid JSON per the stated contract, taking a position on every stated question and staying inside the ticket's scope.",
+      "files": [],
+      "force_skill_invocation": true,
+      "side_effect_level": "local-only",
+      "assertions": [
+        {
+          "type": "file_exists",
+          "path": "PLAN-1.json"
+        },
+        {
+          "type": "json_path",
+          "path": "PLAN-1.json",
+          "json_path": "latitude.genuine"
+        },
+        {
+          "type": "json_path",
+          "path": "PLAN-1.json",
+          "json_path": "answers.q1.position"
+        },
+        {
+          "type": "json_path_not_exists",
+          "path": "PLAN-1.json",
+          "json_path": "out_of_scope_touched.0"
+        }
+      ]
+    }
+  ]
+}

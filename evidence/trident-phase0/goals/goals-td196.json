@@ -1,0 +1,98 @@
+{
+  "task": "td196",
+  "title": "No way to reach a saved session that isn't the newest",
+  "brief_file": "../briefs/td196-brief.md",
+  "written": "2026-09-03, before any path was generated",
+  "arm_visibility_note": "Arms see each question's text only. The kind marking (open|dictated) and the answer keys are auditor-side and never enter any arm's prompt. Leaking a 'dictated' marking would tell an arm which answers are fixed.",
+  "questions": {
+    "q1": {
+      "text": "Where does the affordance for reaching a non-newest saved session live (which UI surface or entry point, named concretely)?",
+      "kind": "open"
+    },
+    "q2": {
+      "text": "How does a user learn that other saved sessions exist at all — what breaks the current silence, and is it passive (always visible) or active (summoned)?",
+      "kind": "open"
+    },
+    "q3": {
+      "text": "How is an individual saved session identified to a human — exactly what is shown per session (id, working directories, timestamp, pane count, title, preview)?",
+      "kind": "open"
+    },
+    "q4": {
+      "text": "What is the end-to-end interaction sequence to open a session that is not the newest, from launch (or from a running instance) to that session being live?",
+      "kind": "open"
+    },
+    "q5": {
+      "text": "When another saved session is opened from a running Terminal Delight, what happens to the currently adopted session (replaced in place, new window, saved and closed)?",
+      "kind": "open"
+    },
+    "q6": {
+      "text": "Does opening a saved session claim it exclusively, and what prevents two running instances from adopting the same saved session?",
+      "kind": "open"
+    },
+    "q7": {
+      "text": "What is the behaviour with zero saved sessions and with exactly one — does the affordance appear at all in each case?",
+      "kind": "open"
+    },
+    "q8": {
+      "text": "In what order are sessions presented, and what rule decides it?",
+      "kind": "open"
+    },
+    "q9": {
+      "text": "How many sessions are shown before an overflow behaviour applies, and what is the overflow behaviour? The plan must name a concrete number.",
+      "kind": "open",
+      "threshold": "t1"
+    },
+    "q10": {
+      "text": "Does any state introduced by this feature persist across restarts (and where), or is the affordance stateless per launch?",
+      "kind": "open"
+    },
+    "q11": {
+      "text": "Can the whole flow be completed without setting any environment variable?",
+      "kind": "dictated",
+      "key": {
+        "dictated_by": "the issue's own Gherkin: 'And I can open either without setting an environment variable'",
+        "correct_patterns": [
+          "(?i)\\byes\\b",
+          "(?i)no env(ironment)? var",
+          "(?i)without (an |any )?env(ironment)? var",
+          "(?i)not require[sd]? .*(env|TD_SESSION)",
+          "(?i)TD_SESSION (remains|stays|kept) .*(escape hatch|optional|unchanged)"
+        ],
+        "contra_patterns": [
+          "(?i)\\bno\\b[,.]? .*env",
+          "(?i)(sets?|exports?|requires?|via) .*TD_SESSION",
+          "(?i)(through|using) (an |the )?env(ironment)? var"
+        ]
+      }
+    },
+    "q12": {
+      "text": "Is the existing cold-launch default — adopting the most recently saved free session with no interaction — preserved unchanged?",
+      "kind": "dictated",
+      "key": {
+        "dictated_by": "the issue's Gherkin: 'When I launch Terminal Delight / Then it opens the most recent one' — a mandatory picker replacing auto-adoption contradicts the registered acceptance",
+        "correct_patterns": [
+          "(?i)\\byes\\b",
+          "(?i)(unchanged|preserved|kept|still) ",
+          "(?i)still (adopts|opens) the most.recent",
+          "(?i)default .*(unchanged|preserved|kept|untouched)"
+        ],
+        "contra_patterns": [
+          "(?i)\\bno\\b",
+          "(?i)(replace[sd]?|removes?) the (auto.?adopt|default)",
+          "(?i)(always|instead) (shows?|opens?) (the |a )?picker",
+          "(?i)no longer (auto|adopts)"
+        ]
+      }
+    }
+  },
+  "thresholds_required": {
+    "t1": "A named maximum number of sessions shown before overflow behaviour applies (q9). Any concrete number satisfies the check; absence fails it."
+  },
+  "out_of_scope": [
+    "Changing the saved-session file format",
+    "Changing the ranking rule inside resolve_session (hooking into it is in scope; reordering its policy is not)",
+    "Removing or breaking the existing TD_SESSION environment variable",
+    "Cross-machine or remote session sync",
+    "A general session-management redesign beyond reaching a non-newest saved session"
+  ]
+}

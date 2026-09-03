@@ -1,0 +1,11 @@
+{
+  "task": "mini",
+  "answers": {
+    "q1": { "position": "A CLI subcommand printing sessions, opened by index", "surface": "-", "rationale": "synthetic" },
+    "q2": { "position": "Sessions get user-assigned titles, falling back to id", "surface": "-", "rationale": "synthetic" },
+    "q3": { "position": "Zero sessions: the affordance is hidden entirely", "surface": "-", "rationale": "synthetic" },
+    "q4": { "position": "The flow sets TD_SESSION under the hood via an environment variable", "surface": "-", "rationale": "synthetic" },
+    "q5": { "position": "Yes - unchanged", "surface": "-", "rationale": "synthetic" }
+  },
+  "out_of_scope_touched": []
+}

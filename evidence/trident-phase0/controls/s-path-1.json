@@ -1,0 +1,11 @@
+{
+  "task": "mini",
+  "answers": {
+    "q1": { "position": "An overlay picker summoned by a keybinding", "surface": "-", "rationale": "synthetic" },
+    "q2": { "position": "Sessions named by id and newest-first timestamp", "surface": "-", "rationale": "synthetic" },
+    "q3": { "position": "Zero sessions: the affordance is hidden entirely", "surface": "-", "rationale": "synthetic" },
+    "q4": { "position": "Yes - the whole flow works with no environment variable", "surface": "-", "rationale": "synthetic" },
+    "q5": { "position": "Yes - unchanged", "surface": "-", "rationale": "synthetic" }
+  },
+  "out_of_scope_touched": []
+}
